@@ -550,7 +550,7 @@ async function syncTradeToSupabase(trade) {
   after_img: trade.afterImg,
   score: trade.score,
   level: trade.level,
-  active_confluences: JSON.stringify(trade.activeConfluences || [])
+  active_confluences: trade.activeConfluences || []
 };
 
     await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}`, {
