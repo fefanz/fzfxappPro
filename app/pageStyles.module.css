@@ -1,0 +1,59 @@
+.app {
+  width: 100%;
+  max-width: 1100px;
+  background: rgba(3, 10, 20, 0.96);
+  border-radius: 20px;
+  padding: 20px 20px 24px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(120, 220, 255, 0.15);
+  backdrop-filter: blur(16px);
+}
+
+.header {
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #b2f5ff;
+}
+
+.subtitle {
+  font-size: 12px;
+  color: #7ea0c0;
+  margin-top: 2px;
+}
+
+.tabs {
+  display: flex;
+  border-radius: 999px;
+  background: #050b15;
+  border: 1px solid rgba(120, 220, 255, 0.18);
+  overflow: hidden;
+}
+
+.tabBtn {
+  flex: 1;
+  padding: 6px 14px;
+  font-size: 12px;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: #7ea0c0;
+}
+
+.tabBtnActive {
+  background: radial-gradient(circle at top, #1e384c, #07121f);
+  color: #e8f5ff;
+  font-weight: 600;
+}
+
