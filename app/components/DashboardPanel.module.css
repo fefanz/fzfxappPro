@@ -1,0 +1,138 @@
+.dashboardLayout {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 14px;
+}
+
+.panel {
+  background: radial-gradient(circle at top left, #111b28 0, #050914 70%);
+  border-radius: 14px;
+  border: 1px solid rgba(120, 220, 255, 0.18);
+  padding: 10px 12px 12px;
+  font-size: 11px;
+}
+
+.panelTitle {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #8fb4d8;
+  margin-bottom: 6px;
+}
+
+.calendarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.calendarNav {
+  display: flex;
+  gap: 4px;
+}
+
+.calBtn {
+  border-radius: 999px;
+  border: 1px solid #32425a;
+  background: #050b15;
+  color: #c6e2ff;
+  font-size: 10px;
+  padding: 2px 7px;
+  cursor: pointer;
+}
+
+.calendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 3px;
+  font-size: 10px;
+}
+
+.calDayHeader {
+  text-align: center;
+  color: #7ea0c0;
+  padding-bottom: 2px;
+}
+
+.calCell {
+  min-height: 46px;
+  border-radius: 8px;
+  background: #050b15;
+  border: 1px solid #1b2636;
+  padding: 3px 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.calDate {
+  font-size: 10px;
+  color: #7ea0c0;
+}
+
+.calPnl {
+  font-size: 10px;
+  margin-top: 2px;
+}
+
+.calPnl.positive {
+  color: #9dffbf;
+}
+
+.calPnl.negative {
+  color: #ffb3b3;
+}
+
+.calPnl.neutral {
+  color: #c6d2e4;
+}
+
+.statRow {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3px;
+}
+
+.statLabel {
+  color: #9fb7d8;
+}
+
+.statValue {
+  color: #e8f5ff;
+  font-weight: 600;
+}
+
+.recentList {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.recentItem {
+  font-size: 10px;
+  color: #c9e4ff;
+  display: flex;
+  justify-content: space-between;
+}
+
+.recentItem span:last-child {
+  color: #9fb7d8;
+}
+
+.hint {
+  font-size: 10px;
+  color: #5c7c9c;
+  margin-top: 4px;
+}
+
+@media (max-width: 860px) {
+  .dashboardLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
