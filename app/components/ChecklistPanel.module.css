@@ -1,0 +1,265 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.card {
+  background: radial-gradient(circle at top left, #172438 0, #050914 60%);
+  border-radius: 14px;
+  padding: 14px;
+  border: 1px solid rgba(120, 220, 255, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.cardActive::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0, 255, 200, 0.06), transparent);
+  pointer-events: none;
+}
+
+.cardLabel {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #8fb4d8;
+}
+
+.cardValue {
+  font-size: 22px;
+  font-weight: 700;
+  color: #7cf7c4;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.cardHelper {
+  font-size: 10px;
+  color: #58708f;
+  max-width: 60%;
+}
+
+.toggleWrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  color: #7ea0c0;
+}
+
+.switch {
+  position: relative;
+  width: 40px;
+  height: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  cursor: pointer;
+  background-color: #222b3a;
+  border: 1px solid #32425a;
+  transition: 0.2s;
+}
+
+.slider::before {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  left: 2px;
+  bottom: 2px;
+  background: #b0c7ff;
+  border-radius: 50%;
+  transition: 0.2s;
+  box-shadow: 0 0 10px #b0c7ff88;
+}
+
+.switch input:checked + .slider {
+  background: linear-gradient(90deg, #11c5a5, #46ff88);
+  border-color: #3ae6b0;
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(18px);
+  background: #021312;
+  box-shadow: 0 0 12px #46ff8888;
+}
+
+.totalSection {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(120, 220, 255, 0.2);
+  text-align: center;
+}
+
+.totalLabel {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #7ea0c0;
+}
+
+.totalValue {
+  font-size: 34px;
+  font-weight: 800;
+  color: #b2ffe4;
+  margin-top: 2px;
+}
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-block;
+  margin-top: 6px;
+}
+
+.badgeLow {
+  background: #ff57571f;
+  color: #ff8b8b;
+  border: 1px solid #ff575766;
+}
+
+.badgeMedium {
+  background: #ffc14f1f;
+  color: #ffd68b;
+  border: 1px solid #ffc14f66;
+}
+
+.badgeHigh {
+  background: #4cd1951f;
+  color: #9dffd4;
+  border: 1px solid #4cd19566;
+}
+
+.badgeAplus {
+  background: linear-gradient(90deg, #40e0d022, #00ff9922);
+  color: #e5fff7;
+  border: 1px solid #00ff99aa;
+}
+
+.totalCaption {
+  font-size: 11px;
+  color: #647da0;
+  margin-top: 4px;
+}
+
+.notesSection {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1.3fr);
+  gap: 16px;
+}
+
+.fieldset {
+  background: radial-gradient(circle at top left, #111b28 0, #050914 70%);
+  border-radius: 14px;
+  border: 1px solid rgba(120, 220, 255, 0.18);
+  padding: 12px 14px 14px;
+}
+
+.fieldsetTitle {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8fb4d8;
+  margin-bottom: 6px;
+}
+
+.smallLabel {
+  font-size: 11px;
+  color: #7ea0c0;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.textInput,
+.textarea,
+.selectInput {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #253347;
+  background: #050b15;
+  color: #e8f5ff;
+  font-size: 12px;
+  padding: 8px 10px;
+  outline: none;
+  resize: vertical;
+  min-height: 40px;
+}
+
+.textarea {
+  min-height: 70px;
+}
+
+.textInput:focus,
+.textarea:focus,
+.selectInput:focus {
+  border-color: #49e0b7;
+  box-shadow: 0 0 0 1px #49e0b733;
+}
+
+.row2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.saveBtn {
+  margin-top: 10px;
+  width: 100%;
+  border-radius: 999px;
+  border: none;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  background: linear-gradient(90deg, #11c5a5, #46ff88);
+  color: #021110;
+  box-shadow: 0 8px 22px rgba(0, 255, 153, 0.35);
+}
+
+.saveBtn:active {
+  transform: translateY(1px);
+  box-shadow: 0 4px 10px rgba(0, 255, 153, 0.25);
+}
+
+.hint {
+  font-size: 10px;
+  color: #5c7c9c;
+  margin-top: 4px;
+}
+
+@media (max-width: 860px) {
+  .notesSection {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .notesSection {
+    grid-template-columns: 1fr;
+  }
+}
+
