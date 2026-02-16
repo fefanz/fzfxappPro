@@ -1,19 +1,19 @@
-import NextAuth from "next-auth";
-import Google from "next-auth/providers/google";
+import type { NextAuthOptions } from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
 import { SupabaseAdapter } from "@auth/supabase-adapter";
+import type { Adapter } from "next-auth/adapters";
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+export const authOptions: NextAuthOptions = {
   adapter: SupabaseAdapter({
     url: process.env.SUPABASE_URL!,
     secret: process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  }),
+  }) as Adapter,
   providers: [
-    Google({
+    GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
   session: { strategy: "database" },
   debug: process.env.NODE_ENV === "development",
-});
-
+};
