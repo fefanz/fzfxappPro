@@ -1,3 +1,21 @@
+const SUPABASE_URL = 'https://txvcrqomdiquoupfmnng.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable__35vZ2yutz4hEH0z0x7sbw_Ukpf0eOe';
+const supabaseAuth = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+async function checkAuth() {
+  const { data: { session } } = await supabaseAuth.auth.getSession();
+  if (!session) {
+    window.location.href = 'login.html';
+    return;
+  }
+}
+checkAuth();
+
+// ADICIONAR FUNÇÃO DE LOGOUT (adicione um botão no header)
+async function logout() {
+  await supabaseAuth.auth.signOut();
+  window.location.href = 'login.html';
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
