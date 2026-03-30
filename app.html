@@ -1,21 +1,3 @@
-const SUPABASE_URL = 'https://txvcrqomdiquoupfmnng.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable__35vZ2yutz4hEH0z0x7sbw_Ukpf0eOe';
-const supabaseAuth = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-async function checkAuth() {
-  const { data: { session } } = await supabaseAuth.auth.getSession();
-  if (!session) {
-    window.location.href = 'login.html';
-    return;
-  }
-}
-checkAuth();
-
-// ADICIONAR FUNÇÃO DE LOGOUT (adicione um botão no header)
-async function logout() {
-  await supabaseAuth.auth.signOut();
-  window.location.href = 'login.html';
-}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -49,6 +31,13 @@ async function logout() {
     .tabs { display: flex; border-radius: 999px; background: #050b15; border: 1px solid rgba(120,220,255,0.18); overflow: hidden; }
     .tab-btn { flex: 1; padding: 6px 14px; font-size: 12px; text-align: center; cursor: pointer; border: none; background: transparent; color: #7ea0c0; }
     .tab-btn.active { background: radial-gradient(circle at top, #1e384c, #07121f); color: #e8f5ff; font-weight: 600; }
+    .logout-btn {
+      padding: 5px 14px; border-radius: 999px;
+      border: 1px solid rgba(255,87,87,0.5);
+      background: rgba(255,87,87,0.1);
+      color: #ffaaaa; font-size: 11px; cursor: pointer;
+    }
+    .logout-btn:hover { background: rgba(255,87,87,0.2); }
 
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap: 14px; margin-top: 18px; }
     .card {
@@ -120,11 +109,7 @@ async function logout() {
     input.text-input:focus, textarea.textarea:focus, select.select-input:focus {
       border-color: #49e0b7; box-shadow: 0 0 0 1px #49e0b733;
     }
-    .row-2 {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap: 8px;
-    }
+    .row-2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
     .save-btn {
       margin-top: 10px; width: 100%; border-radius: 999px; border: none;
       padding: 9px 12px; font-size: 13px; font-weight: 600; cursor: pointer;
@@ -137,30 +122,13 @@ async function logout() {
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
 
-    /* HISTORY */
     .history-header { margin-top: 8px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
     .filters { display: flex; gap: 6px; flex-wrap: wrap; }
-    .filter-btn {
-      padding: 4px 9px; border-radius: 999px; border: 1px solid rgba(120,220,255,0.25);
-      background: #050b15; color: #9fb7d8; font-size: 11px; cursor: pointer;
-    }
+    .filter-btn { padding: 4px 9px; border-radius: 999px; border: 1px solid rgba(120,220,255,0.25); background: #050b15; color: #9fb7d8; font-size: 11px; cursor: pointer; }
     .filter-btn.active { background: #15c58a22; border-color:#15c58a88; color:#dffff4; }
-    .clear-btn {
-      border-radius: 999px; border: 1px solid rgba(255,87,87,0.6);
-      background: rgba(255,87,87,0.16); color: #ffaaaa;
-      font-size: 11px; padding: 4px 10px; cursor: pointer;
-    }
+    .clear-btn { border-radius: 999px; border: 1px solid rgba(255,87,87,0.6); background: rgba(255,87,87,0.16); color: #ffaaaa; font-size: 11px; padding: 4px 10px; cursor: pointer; }
     .history-list { margin-top: 12px; max-height: 360px; overflow-y: auto; padding-right: 4px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
-    .trade-card {
-      border-radius: 12px;
-      border: 1px solid rgba(120,220,255,0.18);
-      background: radial-gradient(circle at top left,#101827 0,#050914 70%);
-      padding: 9px 10px;
-      font-size: 11px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
+    .trade-card { border-radius: 12px; border: 1px solid rgba(120,220,255,0.18); background: radial-gradient(circle at top left,#101827 0,#050914 70%); padding: 9px 10px; font-size: 11px; display: flex; flex-direction: column; gap: 4px; }
     .trade-top { display: flex; justify-content: space-between; align-items: center; gap: 6px; flex-wrap: wrap; }
     .pair { font-weight: 600; color: #e8f5ff; }
     .result-pill { font-size: 10px; padding: 2px 6px; border-radius: 999px; }
@@ -172,38 +140,13 @@ async function logout() {
     .notes-preview { color:#9fb7d8; font-size: 11px; }
     .notes-preview strong { color:#c6e2ff; }
     .card-actions { margin-top: 4px; display:flex; gap:4px; }
-    .btn-small {
-      flex:1;
-      border-radius: 999px;
-      border: 1px solid rgba(120,220,255,0.3);
-      background:#050b15;
-      color:#c9e4ff;
-      font-size:10px;
-      padding:4px 0;
-      cursor:pointer;
-    }
+    .btn-small { flex:1; border-radius: 999px; border: 1px solid rgba(120,220,255,0.3); background:#050b15; color:#c9e4ff; font-size:10px; padding:4px 0; cursor:pointer; }
     .btn-small.view { border-color:#3ae6b0aa; }
     .btn-small.update { border-color:#ffc14faa; }
     .btn-small.delete { border-color:#ff5757aa; color:#ffb7b7; }
 
-    /* Modal */
-    .modal-backdrop {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.6);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      z-index: 50;
-    }
-    .modal {
-      width: 100%;
-      max-width: 640px;
-      background: #050914;
-      border-radius: 18px;
-      border: 1px solid rgba(120,220,255,0.35);
-      padding: 16px 18px 18px;
-      box-shadow: 0 18px 40px rgba(0,0,0,0.8);
-    }
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; z-index: 50; }
+    .modal { width: 100%; max-width: 640px; background: #050914; border-radius: 18px; border: 1px solid rgba(120,220,255,0.35); padding: 16px 18px 18px; box-shadow: 0 18px 40px rgba(0,0,0,0.8); }
     .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
     .modal-title { font-size: 16px; font-weight:600; }
     .modal-close { border:none; background:transparent; color:#9fb7d8; font-size:18px; cursor:pointer; }
@@ -216,45 +159,20 @@ async function logout() {
     .chart-link { font-size:10px; color:#8fd4ff; text-decoration:none; }
     .chart-link:hover { text-decoration:underline; }
 
-    /* Dashboard */
     .dashboard-layout { margin-top: 10px; display:grid; grid-template-columns: minmax(0,1.4fr) minmax(0,1fr); gap:14px; }
-    .panel {
-      background: radial-gradient(circle at top left,#111b28 0,#050914 70%);
-      border-radius: 14px;
-      border: 1px solid rgba(120,220,255,0.18);
-      padding: 10px 12px 12px;
-      font-size:11px;
-    }
+    .panel { background: radial-gradient(circle at top left,#111b28 0,#050914 70%); border-radius: 14px; border: 1px solid rgba(120,220,255,0.18); padding: 10px 12px 12px; font-size:11px; }
     .panel-title { font-size:12px; text-transform:uppercase; letter-spacing:0.12em; color:#8fb4d8; margin-bottom:6px; }
     .calendar-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
     .calendar-nav { display:flex; gap:4px; }
-    .cal-btn {
-      border-radius:999px; border:1px solid #32425a; background:#050b15; color:#c6e2ff;
-      font-size:10px; padding:2px 7px; cursor:pointer;
-    }
-    .calendar-grid {
-      display:grid;
-      grid-template-columns: repeat(7, minmax(0,1fr));
-      gap:3px;
-      font-size:10px;
-    }
+    .cal-btn { border-radius:999px; border:1px solid #32425a; background:#050b15; color:#c6e2ff; font-size:10px; padding:2px 7px; cursor:pointer; }
+    .calendar-grid { display:grid; grid-template-columns: repeat(7, minmax(0,1fr)); gap:3px; font-size:10px; }
     .cal-day-header { text-align:center; color:#7ea0c0; padding-bottom:2px; }
-    .cal-cell {
-      min-height:46px;
-      border-radius:8px;
-      background:#050b15;
-      border:1px solid #1b2636;
-      padding:3px 4px;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-    }
+    .cal-cell { min-height:46px; border-radius:8px; background:#050b15; border:1px solid #1b2636; padding:3px 4px; display:flex; flex-direction:column; justify-content:space-between; }
     .cal-date { font-size:10px; color:#7ea0c0; }
     .cal-pnl { font-size:10px; margin-top:2px; }
     .cal-pnl.positive { color:#9dffbf; }
     .cal-pnl.negative { color:#ffb3b3; }
     .cal-pnl.neutral { color:#c6d2e4; }
-
     .stat-row { display:flex; justify-content:space-between; margin-top:3px; }
     .stat-label { color:#9fb7d8; }
     .stat-value { color:#e8f5ff; font-weight:600; }
@@ -262,14 +180,8 @@ async function logout() {
     .recent-item { font-size:10px; color:#c9e4ff; display:flex; justify-content:space-between; }
     .recent-item span:last-child { color:#9fb7d8; }
 
-    @media (max-width: 860px) {
-      .notes-section { grid-template-columns: 1fr; }
-      .dashboard-layout { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 720px) {
-      body { padding: 14px; }
-      .app { padding: 16px 14px 18px; }
-    }
+    @media (max-width: 860px) { .notes-section { grid-template-columns: 1fr; } .dashboard-layout { grid-template-columns: 1fr; } }
+    @media (max-width: 720px) { body { padding: 14px; } .app { padding: 16px 14px 18px; } }
   </style>
 </head>
 <body>
@@ -279,24 +191,24 @@ async function logout() {
         <div class="title">FZFX Trade Validator</div>
         <div class="subtitle">Confluence checklist + trade journal</div>
       </div>
-      <div class="tabs">
-        <button class="tab-btn active" data-tab="checklist">Checklist</button>
-        <button class="tab-btn" data-tab="history">History</button>
-        <button class="tab-btn" data-tab="dashboard">Dashboard</button>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="checklist">Checklist</button>
+          <button class="tab-btn" data-tab="history">History</button>
+          <button class="tab-btn" data-tab="dashboard">Dashboard</button>
+        </div>
+        <button class="logout-btn" onclick="logout()">Logout</button>
       </div>
     </div>
 
-    <!-- CHECKLIST PANEL -->
     <div id="panel-checklist" class="tab-panel active">
       <div class="grid" id="cards-container"></div>
-
       <div class="total-section">
         <div class="total-label">Total overall score</div>
         <div id="totalScore" class="total-value">0%</div>
-        <div id="badge" class="badge low">Low confluence</div>
+        <div id="badge" class="badge low">No confluence</div>
         <div id="caption" class="total-caption">Tick the confluences that are present in this setup.</div>
       </div>
-
       <div class="notes-section">
         <div class="fieldset">
           <div class="fieldset-title">Trade plan</div>
@@ -317,9 +229,8 @@ async function logout() {
             </div>
           </div>
           <label class="small-label" for="notesInput" style="margin-top:6px;">Quick notes</label>
-          <textarea id="notesInput" class="textarea" placeholder="Why does this trade make sense? Structure, liquidity, news, higher timeframe context..."></textarea>
+          <textarea id="notesInput" class="textarea" placeholder="Why does this trade make sense?"></textarea>
         </div>
-
         <div class="fieldset">
           <div class="fieldset-title">Risk, result & screenshots</div>
           <label class="small-label" for="riskInput">Risk (R or %)</label>
@@ -347,12 +258,11 @@ async function logout() {
           <label class="small-label" for="afterImgInput" style="margin-top:6px;">Screenshot AFTER (link)</label>
           <input id="afterImgInput" class="text-input" placeholder="URL of the chart after result" />
           <button id="saveBtn" class="save-btn">Save this setup</button>
-          <div class="hint">Trades are stored only on this device (localStorage). Ideal for a personal journal.</div>
+          <div class="hint">Trades are stored only on this device (localStorage).</div>
         </div>
       </div>
     </div>
 
-    <!-- HISTORY PANEL -->
     <div id="panel-history" class="tab-panel">
       <div class="history-header">
         <div class="filters">
@@ -367,7 +277,6 @@ async function logout() {
       <div class="history-list" id="historyList"></div>
     </div>
 
-    <!-- DASHBOARD PANEL -->
     <div id="panel-dashboard" class="tab-panel">
       <div class="dashboard-layout">
         <div class="panel">
@@ -384,26 +293,11 @@ async function logout() {
         </div>
         <div class="panel">
           <div class="panel-title">Stats & recent trades</div>
-          <div class="stat-row">
-            <div class="stat-label">Total trades</div>
-            <div id="statTotal" class="stat-value">0</div>
-          </div>
-          <div class="stat-row">
-            <div class="stat-label">Win rate</div>
-            <div id="statWinRate" class="stat-value">0%</div>
-          </div>
-          <div class="stat-row">
-            <div class="stat-label">Best pair (P&L)</div>
-            <div id="statBestPair" class="stat-value">-</div>
-          </div>
-          <div class="stat-row">
-            <div class="stat-label">Worst pair (P&L)</div>
-            <div id="statWorstPair" class="stat-value">-</div>
-          </div>
-          <div class="stat-row">
-            <div class="stat-label">Total P&L</div>
-            <div id="statTotalPnl" class="stat-value">-</div>
-          </div>
+          <div class="stat-row"><div class="stat-label">Total trades</div><div id="statTotal" class="stat-value">0</div></div>
+          <div class="stat-row"><div class="stat-label">Win rate</div><div id="statWinRate" class="stat-value">0%</div></div>
+          <div class="stat-row"><div class="stat-label">Best pair (P&L)</div><div id="statBestPair" class="stat-value">-</div></div>
+          <div class="stat-row"><div class="stat-label">Worst pair (P&L)</div><div id="statWorstPair" class="stat-value">-</div></div>
+          <div class="stat-row"><div class="stat-label">Total P&L</div><div id="statTotalPnl" class="stat-value">-</div></div>
           <div class="panel-title" style="margin-top:10px;">Recent trades</div>
           <div id="recentList" class="recent-list"></div>
         </div>
@@ -411,7 +305,6 @@ async function logout() {
     </div>
   </div>
 
-  <!-- DETAIL MODAL -->
   <div id="modalBackdrop" class="modal-backdrop">
     <div class="modal">
       <div class="modal-header">
@@ -422,600 +315,320 @@ async function logout() {
     </div>
   </div>
 
-<script>
-/* ====== CONFLUENCE CONFIG ====== */
-const confluences = [
-  { id: "weekly", label: "WEEKLY", weight: 10, helper: "Higher timeframe weekly trend aligned" },
-  { id: "daily",  label: "DAILY",  weight: 10, helper: "Daily trend aligned" },
-  { id: "h4",     label: "4H",     weight: 10, helper: "4H trend aligned" },
-  { id: "aoi",    label: "AOI", weight: 20, helper: "Strong area of interest" },
-  { id: "bos",    label: "BOS / SHIFT", weight: 15, helper: "Break of structure in your direction" },
-  { id: "fibo",   label: "FIBO 62%", weight: 10, helper: "Prime fib retracement (around 62%)" },
-  { id: "medias", label: "EMAs", weight: 10, helper: "EMAs stacked in clear trend" },
-  { id: "retest", label: "RETEST", weight: 10, helper: "Clean break & retest" },
-  { id: "tl",     label: "TL / FLAG", weight: 8,  helper: "Trendline / flag / channel structure" },
-  { id: "candle", label: "CANDLE", weight: 5,  helper: "Strong trigger candle (engulfing, hammer, etc.)" },
-  { id: "poc",    label: "POC", weight: 5,  helper: "Point of control / volume node at entry" },
-  { id: "ob",     label: "ORDER BLOCK", weight: 5, helper: "Clean OB inside AOI" }
-];
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // ====== AUTH GUARD ======
+    const _SURL = 'https://txvcrqomdiquoupfmnng.supabase.co';
+    const _SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR4dmNycW9tZGlxdW91cGZtbm5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MzYxNzYsImV4cCI6MjA5MDMxMjE3Nn0.QdMaX5cy8a3pqTcKK7f5-QPvsrhjDM2YXVeZ1WEfbI4';
+    const _sb = supabase.createClient(_SURL, _SKEY);
 
-/* ====== ELEMENTS ====== */
-const container = document.getElementById("cards-container");
-const totalScoreEl = document.getElementById("totalScore");
-const badgeEl = document.getElementById("badge");
-const captionEl = document.getElementById("caption");
+    (async () => {
+      const { data: { session } } = await _sb.auth.getSession();
+      if (!session) { window.location.href = 'login.html'; }
+    })();
 
-const pairInput = document.getElementById("pairInput");
-const directionInput = document.getElementById("directionInput");
-const sessionInput = document.getElementById("sessionInput");
-const notesInput = document.getElementById("notesInput");
-const riskInput = document.getElementById("riskInput");
-const pnlInput = document.getElementById("pnlInput");
-const resultInput = document.getElementById("resultInput");
-const dateInput = document.getElementById("dateInput");
-const beforeImgInput = document.getElementById("beforeImgInput");
-const afterImgInput = document.getElementById("afterImgInput");
-const saveBtn = document.getElementById("saveBtn");
+    async function logout() {
+      await _sb.auth.signOut();
+      window.location.href = 'login.html';
+    }
+    // ====== END AUTH GUARD ======
 
-const historyList = document.getElementById("historyList");
-const clearHistoryBtn = document.getElementById("clearHistoryBtn");
-const filterButtons = document.querySelectorAll(".filter-btn");
+    const confluences = [
+      { id: "weekly", label: "WEEKLY",      weight: 10, helper: "Higher timeframe weekly trend aligned" },
+      { id: "daily",  label: "DAILY",       weight: 10, helper: "Daily trend aligned" },
+      { id: "h4",     label: "4H",          weight: 10, helper: "4H trend aligned" },
+      { id: "aoi",    label: "AOI",         weight: 20, helper: "Strong area of interest" },
+      { id: "bos",    label: "BOS / SHIFT", weight: 15, helper: "Break of structure in your direction" },
+      { id: "fibo",   label: "FIBO 62%",    weight: 10, helper: "Prime fib retracement (around 62%)" },
+      { id: "medias", label: "EMAs",        weight: 10, helper: "EMAs stacked in clear trend" },
+      { id: "retest", label: "RETEST",      weight: 10, helper: "Clean break & retest" },
+      { id: "tl",     label: "TL / FLAG",   weight: 8,  helper: "Trendline / flag / channel structure" },
+      { id: "candle", label: "CANDLE",      weight: 5,  helper: "Strong trigger candle (engulfing, hammer, etc.)" },
+      { id: "poc",    label: "POC",         weight: 5,  helper: "Point of control / volume node at entry" },
+      { id: "ob",     label: "ORDER BLOCK", weight: 5,  helper: "Clean OB inside AOI" }
+    ];
 
-const modalBackdrop = document.getElementById("modalBackdrop");
-const modalContent = document.getElementById("modalContent");
-const modalCloseBtn = document.getElementById("modalCloseBtn");
+    const container = document.getElementById("cards-container");
+    const totalScoreEl = document.getElementById("totalScore");
+    const badgeEl = document.getElementById("badge");
+    const captionEl = document.getElementById("caption");
+    const pairInput = document.getElementById("pairInput");
+    const directionInput = document.getElementById("directionInput");
+    const sessionInput = document.getElementById("sessionInput");
+    const notesInput = document.getElementById("notesInput");
+    const riskInput = document.getElementById("riskInput");
+    const pnlInput = document.getElementById("pnlInput");
+    const resultInput = document.getElementById("resultInput");
+    const dateInput = document.getElementById("dateInput");
+    const beforeImgInput = document.getElementById("beforeImgInput");
+    const afterImgInput = document.getElementById("afterImgInput");
+    const saveBtn = document.getElementById("saveBtn");
+    const historyList = document.getElementById("historyList");
+    const clearHistoryBtn = document.getElementById("clearHistoryBtn");
+    const filterButtons = document.querySelectorAll(".filter-btn");
+    const modalBackdrop = document.getElementById("modalBackdrop");
+    const modalContent = document.getElementById("modalContent");
+    const modalCloseBtn = document.getElementById("modalCloseBtn");
+    const calendarGrid = document.getElementById("calendarGrid");
+    const calendarMonthLabel = document.getElementById("calendarMonthLabel");
+    const prevMonthBtn = document.getElementById("prevMonthBtn");
+    const nextMonthBtn = document.getElementById("nextMonthBtn");
+    const todayMonthBtn = document.getElementById("todayMonthBtn");
+    const statTotal = document.getElementById("statTotal");
+    const statWinRate = document.getElementById("statWinRate");
+    const statBestPair = document.getElementById("statBestPair");
+    const statWorstPair = document.getElementById("statWorstPair");
+    const statTotalPnl = document.getElementById("statTotalPnl");
+    const recentList = document.getElementById("recentList");
 
-const calendarGrid = document.getElementById("calendarGrid");
-const calendarMonthLabel = document.getElementById("calendarMonthLabel");
-const prevMonthBtn = document.getElementById("prevMonthBtn");
-const nextMonthBtn = document.getElementById("nextMonthBtn");
-const todayMonthBtn = document.getElementById("todayMonthBtn");
+    function renderCards() {
+      confluences.forEach(conf => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.id = "card-" + conf.id;
+        card.innerHTML = `
+          <div class="card-label">${conf.label}</div>
+          <div class="card-value">${conf.weight}%</div>
+          <div class="card-footer">
+            <div class="card-helper">${conf.helper}</div>
+            <label class="toggle-wrapper">
+              <span>Off</span>
+              <div class="switch">
+                <input type="checkbox" id="${conf.id}" />
+                <span class="slider"></span>
+              </div>
+            </label>
+          </div>`;
+        container.appendChild(card);
+        const checkbox = card.querySelector("input");
+        const toggleText = card.querySelector(".toggle-wrapper span");
+        checkbox.addEventListener("change", () => {
+          card.classList.toggle("active", checkbox.checked);
+          toggleText.textContent = checkbox.checked ? "On" : "Off";
+          updateTotal();
+        });
+      });
+    }
 
-const statTotal = document.getElementById("statTotal");
-const statWinRate = document.getElementById("statWinRate");
-const statBestPair = document.getElementById("statBestPair");
-const statWorstPair = document.getElementById("statWorstPair");
-const statTotalPnl = document.getElementById("statTotalPnl");
-const recentList = document.getElementById("recentList");
+    function calculateTotal() {
+      let total = 0; const activeIds = [];
+      confluences.forEach(conf => {
+        const cb = document.getElementById(conf.id);
+        if (cb && cb.checked) { total += conf.weight; activeIds.push(conf.id); }
+      });
+      return { total, activeIds };
+    }
 
-/* ====== RENDER CHECKLIST CARDS ====== */
-function renderCards() {
-  confluences.forEach(conf => {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.id = "card-" + conf.id;
-    card.innerHTML = `
-      <div class="card-label">${conf.label}</div>
-      <div class="card-value">${conf.weight}%</div>
-      <div class="card-footer">
-        <div class="card-helper">${conf.helper}</div>
-        <label class="toggle-wrapper">
-          <span>Off</span>
-          <div class="switch">
-            <input type="checkbox" id="${conf.id}" />
-            <span class="slider"></span>
+    function describeLevel(total) {
+      if (total === 0) return { level: "No confluence", caption: "No confluences marked – stay out.", badgeClass: "low" };
+      if (total <= 40) return { level: "Low confluence", caption: "Weak setup. Probably skip.", badgeClass: "low" };
+      if (total <= 80) return { level: "Medium confluence", caption: "Decent setup, but not A+.", badgeClass: "medium" };
+      if (total <= 100) return { level: "High confluence", caption: "Strong setup. Trade only if risk makes sense.", badgeClass: "high" };
+      return { level: "A+ setup", caption: "Very rare, high conviction setup.", badgeClass: "aplus" };
+    }
+
+    function updateTotal() {
+      const { total } = calculateTotal();
+      totalScoreEl.textContent = total + "%";
+      const info = describeLevel(total);
+      badgeEl.textContent = info.level;
+      badgeEl.className = "badge " + info.badgeClass;
+      captionEl.textContent = info.caption;
+    }
+
+    const STORAGE_KEY = "fzfx_trades_v3_en";
+    function getHistory() { try { const r = localStorage.getItem(STORAGE_KEY); return r ? JSON.parse(r) : []; } catch { return []; } }
+    function saveHistory(list) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); } catch {} }
+
+    saveBtn.addEventListener("click", () => {
+      const { total, activeIds } = calculateTotal();
+      const info = describeLevel(total);
+      if (total === 0 && !confirm("Score is 0%. Save anyway?")) return;
+      const now = new Date();
+      const chosenDate = dateInput.value ? new Date(dateInput.value + "T00:00:00") : now;
+      const history = getHistory();
+      const trade = {
+        id: Date.now().toString(), timestamp: now.getTime(), date: chosenDate.toISOString(),
+        pair: (pairInput.value||"").trim(), direction: directionInput.value||"",
+        session: (sessionInput.value||"").trim(), notes: (notesInput.value||"").trim(),
+        risk: (riskInput.value||"").trim(), pnl: (pnlInput.value||"").trim(),
+        result: resultInput.value||"", beforeImg: (beforeImgInput.value||"").trim(),
+        afterImg: (afterImgInput.value||"").trim(), score: total, level: info.level,
+        activeConfluences: activeIds.map(id => { const c = confluences.find(x=>x.id===id); return c ? c.label : id; })
+      };
+      history.push(trade); saveHistory(history);
+      renderHistory(currentFilter); renderDashboard();
+      saveBtn.textContent = "Saved ✅";
+      setTimeout(()=> saveBtn.textContent = "Save this setup", 1300);
+    });
+
+    let currentFilter = "ALL";
+    function renderHistory(filter = "ALL") {
+      currentFilter = filter;
+      const history = getHistory().sort((a,b)=> b.timestamp - a.timestamp);
+      historyList.innerHTML = "";
+      const filtered = history.filter(t => {
+        if (filter === "ALL") return true;
+        if (filter === "WIN") return t.result === "Gain";
+        if (filter === "LOSS") return t.result === "Loss";
+        if (filter === "BE") return t.result === "Break-even";
+        if (filter === "NE") return t.result === "Not executed";
+        return true;
+      });
+      if (!filtered.length) { historyList.innerHTML = "<div class='hint'>No trades for this filter yet.</div>"; return; }
+      filtered.forEach(trade => {
+        const div = document.createElement("div"); div.className = "trade-card";
+        const infoLevel = describeLevel(trade.score);
+        let resultClass = "result-ne", resultText = trade.result || "N/A";
+        if (trade.result === "Gain") { resultClass = "result-win"; resultText = "WIN"; }
+        else if (trade.result === "Loss") { resultClass = "result-loss"; resultText = "LOSS"; }
+        else if (trade.result === "Break-even") { resultClass = "result-be"; resultText = "BE"; }
+        const date = new Date(trade.date || trade.timestamp);
+        const dateStr = date.toLocaleDateString("en-GB",{ day:"2-digit", month:"2-digit", year:"numeric" });
+        div.innerHTML = `
+          <div class="trade-top">
+            <div><div class="pair">${trade.pair || "No pair"}</div><div class="meta-line">${dateStr} • ${trade.session || "Session not set"}</div></div>
+            <div style="text-align:right;"><div class="result-pill ${resultClass}">${resultText}</div><div style="font-size:10px;color:#9fb7d8;">${trade.score}% • ${infoLevel.level}</div></div>
           </div>
-        </label>
-      </div>`;
-    container.appendChild(card);
-    const checkbox = card.querySelector("input");
-    const toggleText = card.querySelector(".toggle-wrapper span");
-    checkbox.addEventListener("change", () => {
-      if (checkbox.checked) {
-        card.classList.add("active");
-        toggleText.textContent = "On";
-      } else {
-        card.classList.remove("active");
-        toggleText.textContent = "Off";
+          <div class="meta-line">Direction: <span style="color:#c6e2ff;">${trade.direction || "-"}</span> • Risk: <span style="color:#c6e2ff;">${trade.risk || "-"}</span></div>
+          <div class="meta-line">P&L: <span style="color:${(trade.pnl||'').trim().startsWith('-') ? '#ffb3b3' : '#9dffbf'};">${trade.pnl || "-"}</span></div>
+          <div class="notes-preview"><strong>Notes:</strong> ${(trade.notes || "No notes.").slice(0,120)}${trade.notes && trade.notes.length>120 ? "..." : ""}</div>
+          <div class="notes-preview"><strong>Confluences:</strong> ${trade.activeConfluences && trade.activeConfluences.length ? trade.activeConfluences.join(", ") : "None"}</div>
+          <div class="card-actions">
+            <button class="btn-small view" data-id="${trade.id}">View</button>
+            <button class="btn-small update" data-id="${trade.id}">Update</button>
+            <button class="btn-small delete" data-id="${trade.id}">Delete</button>
+          </div>`;
+        historyList.appendChild(div);
+      });
+      historyList.querySelectorAll(".btn-small.view").forEach(btn=>btn.addEventListener("click", ()=>openModal(btn.dataset.id)));
+      historyList.querySelectorAll(".btn-small.delete").forEach(btn=>btn.addEventListener("click", ()=>deleteTrade(btn.dataset.id)));
+      historyList.querySelectorAll(".btn-small.update").forEach(btn=>btn.addEventListener("click", ()=>loadTradeToForm(btn.dataset.id)));
+    }
+
+    function deleteTrade(id) {
+      if (!confirm("Delete this trade?")) return;
+      saveHistory(getHistory().filter(t=> t.id !== id));
+      renderHistory(currentFilter); renderDashboard();
+    }
+
+    function loadTradeToForm(id) {
+      const trade = getHistory().find(t=> t.id === id); if (!trade) return;
+      pairInput.value = trade.pair||""; directionInput.value = trade.direction||"";
+      sessionInput.value = trade.session||""; notesInput.value = trade.notes||"";
+      riskInput.value = trade.risk||""; pnlInput.value = trade.pnl||"";
+      resultInput.value = trade.result||""; beforeImgInput.value = trade.beforeImg||"";
+      afterImgInput.value = trade.afterImg||"";
+      if (trade.date) { try { dateInput.value = new Date(trade.date).toISOString().slice(0,10); } catch { dateInput.value=""; } }
+      document.querySelectorAll(".tab-btn").forEach(btn=>{ btn.classList.remove("active"); if(btn.dataset.tab==="checklist") btn.classList.add("active"); });
+      document.querySelectorAll(".tab-panel").forEach(p=>p.classList.remove("active"));
+      document.getElementById("panel-checklist").classList.add("active");
+      window.scrollTo({top:0,behavior:"smooth"});
+    }
+
+    function openModal(id) {
+      const t = getHistory().find(x=>x.id===id); if (!t) return;
+      const infoLevel = describeLevel(t.score);
+      const date = new Date(t.date || t.timestamp);
+      const dateStr = date.toLocaleString("en-GB",{ day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" });
+      const mapResult = () => { if(t.result==="Gain") return "WIN (TP)"; if(t.result==="Loss") return "LOSS (SL)"; if(t.result==="Break-even") return "BREAK-EVEN"; if(t.result==="Not executed") return "Not executed"; return "N/A"; };
+      modalContent.innerHTML = `
+        <div class="modal-grid">
+          <div><div class="modal-label">Pair</div><div class="modal-value">${t.pair||"-"}</div></div>
+          <div><div class="modal-label">Direction</div><div class="modal-value">${t.direction||"-"}</div></div>
+          <div><div class="modal-label">Date</div><div class="modal-value">${dateStr}</div></div>
+          <div><div class="modal-label">Session</div><div class="modal-value">${t.session||"-"}</div></div>
+          <div><div class="modal-label">Score</div><div class="modal-value">${t.score}% • ${infoLevel.level}</div></div>
+          <div><div class="modal-label">Outcome</div><div class="modal-value">${mapResult()}</div></div>
+          <div><div class="modal-label">Risk</div><div class="modal-value">${t.risk||"-"}</div></div>
+          <div><div class="modal-label">P&L</div><div class="modal-value">${t.pnl||"-"}</div></div>
+        </div>
+        <div class="modal-section-title">Notes</div>
+        <div class="modal-notes">${(t.notes||"No notes.").replace(/\n/g,"<br>")}</div>
+        <div class="modal-section-title">Confluences</div>
+        <div class="modal-notes">${t.activeConfluences&&t.activeConfluences.length?t.activeConfluences.join(", "):"None"}</div>
+        <div class="modal-section-title">Chart images</div>
+        <div class="link-row">
+          <div><span class="modal-label">Before</span><br>${t.beforeImg?`<a href="${t.beforeImg}" target="_blank" class="chart-link">${t.beforeImg}</a>`:"<span style='font-size:10px;color:#7ea0c0;'>No link.</span>"}</div>
+          <div><span class="modal-label">After</span><br>${t.afterImg?`<a href="${t.afterImg}" target="_blank" class="chart-link">${t.afterImg}</a>`:"<span style='font-size:10px;color:#7ea0c0;'>No link.</span>"}</div>
+        </div>`;
+      modalBackdrop.style.display = "flex";
+    }
+    modalCloseBtn.addEventListener("click", ()=> modalBackdrop.style.display = "none");
+    modalBackdrop.addEventListener("click", (e)=> { if(e.target===modalBackdrop) modalBackdrop.style.display="none"; });
+
+    filterButtons.forEach(btn=>{ btn.addEventListener("click", ()=>{ filterButtons.forEach(b=>b.classList.remove("active")); btn.classList.add("active"); renderHistory(btn.dataset.filter); }); });
+    clearHistoryBtn.addEventListener("click", ()=>{ if(!confirm("Clear ALL trades?")) return; saveHistory([]); renderHistory(currentFilter); renderDashboard(); });
+
+    let currentMonth = (new Date()).getMonth();
+    let currentYear = (new Date()).getFullYear();
+
+    function parseNumericPnl(pnlStr) {
+      if (!pnlStr) return 0;
+      const num = parseFloat(pnlStr.replace(/[^\d\-\.,]/g,"").replace(",","."));
+      return isNaN(num) ? 0 : num;
+    }
+
+    function renderDashboard() {
+      const history = getHistory();
+      const wins = history.filter(t=>t.result==="Gain").length;
+      const winRate = history.length ? Math.round((wins/history.length)*100) : 0;
+      let totalPnlValue = 0;
+      const pnlByPair = {};
+      history.forEach(t=>{ const num = parseNumericPnl(t.pnl); totalPnlValue += num; const key = t.pair||"N/A"; pnlByPair[key] = (pnlByPair[key]||0)+num; });
+      let bestPair="-",bestVal=-Infinity,worstPair="-",worstVal=Infinity;
+      Object.entries(pnlByPair).forEach(([pair,val])=>{ if(val>bestVal){bestVal=val;bestPair=pair;} if(val<worstVal){worstVal=val;worstPair=pair;} });
+      statTotal.textContent = history.length;
+      statWinRate.textContent = winRate + "%";
+      statBestPair.textContent = bestPair;
+      statWorstPair.textContent = worstPair;
+      statTotalPnl.textContent = history.length ? (totalPnlValue>=0?"+":"")+totalPnlValue.toFixed(2) : "-";
+      recentList.innerHTML = "";
+      const sorted = history.slice().sort((a,b)=>b.timestamp-a.timestamp).slice(0,8);
+      if (!sorted.length) { recentList.innerHTML = "<div class='hint'>No trades yet.</div>"; }
+      else { sorted.forEach(t=>{ const d=new Date(t.date||t.timestamp); const row=document.createElement("div"); row.className="recent-item"; row.innerHTML=`<span>${t.pair||"No pair"} • ${t.result||"N/A"} • ${t.score}%</span><span>${d.toLocaleDateString("en-GB",{day:"2-digit",month:"2-digit"})} • ${t.pnl||"-"}</span>`; recentList.appendChild(row); }); }
+      renderCalendar();
+    }
+
+    function renderCalendar() {
+      calendarGrid.innerHTML = "";
+      const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+      calendarMonthLabel.textContent = monthNames[currentMonth] + " " + currentYear;
+      const firstDay = new Date(currentYear, currentMonth, 1);
+      const startWeekday = firstDay.getDay();
+      const daysInMonth = new Date(currentYear, currentMonth+1, 0).getDate();
+      ["S","M","T","W","T","F","S"].forEach(d=>{ const h=document.createElement("div"); h.className="cal-day-header"; h.textContent=d; calendarGrid.appendChild(h); });
+      for(let i=0;i<startWeekday;i++) calendarGrid.appendChild(document.createElement("div"));
+      const pnlByDay = {};
+      getHistory().forEach(t=>{ const d=new Date(t.date||t.timestamp); if(d.getMonth()===currentMonth&&d.getFullYear()===currentYear){ const day=d.getDate(); pnlByDay[day]=(pnlByDay[day]||0)+parseNumericPnl(t.pnl); } });
+      for(let day=1;day<=daysInMonth;day++){
+        const cell=document.createElement("div"); cell.className="cal-cell";
+        const dateSpan=document.createElement("div"); dateSpan.className="cal-date"; dateSpan.textContent=day; cell.appendChild(dateSpan);
+        const pnl=pnlByDay[day]||0; const pnlSpan=document.createElement("div"); pnlSpan.className="cal-pnl";
+        if(pnlByDay[day]===undefined){ pnlSpan.textContent=""; }
+        else if(pnl>0){ pnlSpan.classList.add("positive"); pnlSpan.textContent="+"+pnl.toFixed(2); }
+        else if(pnl<0){ pnlSpan.classList.add("negative"); pnlSpan.textContent=pnl.toFixed(2); }
+        else{ pnlSpan.classList.add("neutral"); pnlSpan.textContent="0.00"; }
+        cell.appendChild(pnlSpan); calendarGrid.appendChild(cell);
       }
-      updateTotal();
+    }
+
+    prevMonthBtn.addEventListener("click",()=>{ currentMonth--; if(currentMonth<0){currentMonth=11;currentYear--;} renderCalendar(); });
+    nextMonthBtn.addEventListener("click",()=>{ currentMonth++; if(currentMonth>11){currentMonth=0;currentYear++;} renderCalendar(); });
+    todayMonthBtn.addEventListener("click",()=>{ const now=new Date(); currentMonth=now.getMonth(); currentYear=now.getFullYear(); renderCalendar(); });
+
+    document.querySelectorAll(".tab-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active")); btn.classList.add("active");
+        const tab = btn.dataset.tab;
+        document.querySelectorAll(".tab-panel").forEach(p=>p.classList.remove("active"));
+        document.getElementById("panel-"+tab).classList.add("active");
+        if(tab==="history") renderHistory(currentFilter);
+        else if(tab==="dashboard") renderDashboard();
+      });
     });
-  });
-}
 
-function calculateTotal() {
-  let total = 0;
-  const activeIds = [];
-  confluences.forEach(conf => {
-    const cb = document.getElementById(conf.id);
-    if (cb && cb.checked) {
-      total += conf.weight;
-      activeIds.push(conf.id);
-    }
-  });
-  return { total, activeIds };
-}
-
-function describeLevel(total) {
-  if (total === 0) return { level: "No confluence", caption: "No confluences marked – stay out.", badgeClass: "low" };
-  if (total <= 40) return { level: "Low confluence", caption: "Weak setup. Probably skip.", badgeClass: "low" };
-  if (total <= 80) return { level: "Medium confluence", caption: "Decent setup, but not A+.", badgeClass: "medium" };
-  if (total <= 100) return { level: "High confluence", caption: "Strong setup. Trade only if risk makes sense.", badgeClass: "high" };
-  return { level: "A+ setup", caption: "Very rare, high conviction setup.", badgeClass: "aplus" };
-}
-
-function updateTotal() {
-  const { total } = calculateTotal();
-  totalScoreEl.textContent = total + "%";
-  const info = describeLevel(total);
-  badgeEl.textContent = info.level;
-  badgeEl.className = "badge " + info.badgeClass;
-  captionEl.textContent = info.caption;
-}
-
-/* ====== LOCAL STORAGE ====== */
-
-/* ====== SUPABASE CONFIG (OPTIONAL PRO BACKEND) ====== */
-const SUPABASE_URL = "https://ymhhrespvpvmfykbbmux.supabase.co"; // e.g. https://xxxxx.supabase.co
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltaGhyZXNwdnB2bWZ5a2JibXV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4NTIyNDEsImV4cCI6MjA3OTQyODI0MX0.mYjGLQzup-j_4rBhpbnxcqWNmRlA-tnTuEhEe4oT2Hs"; // Public anon key
-const SUPABASE_TABLE = "trades";
-
-async function syncTradeToSupabase(trade) {   if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return; // not configured    try {     const payload = {       id: trade.id,       timestamp: trade.timestamp,       date: trade.date,       pair: trade.pair,       direction: trade.direction,       session: trade.session,       notes: trade.notes,       risk: trade.risk,       pnl: trade.pnl,       result: trade.result,       before_img: trade.beforeImg,       after_img: trade.afterImg,       score: trade.score,       level: trade.level,       active_confluences: JSON.stringify(trade.activeConfluences || [])     };      console.log("🔄 Enviando para Supabase:", payload);      const res = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}`, {       method: "POST",       headers: {         apikey: SUPABASE_ANON_KEY,         Authorization: `Bearer ${SUPABASE_ANON_KEY}`,         "Content-Type": "application/json",         Prefer: "resolution=merge-duplicates,return=representation"       },       body: JSON.stringify(payload)     });      const text = await res.text();     console.log("✅ Resposta Supabase:", res.status, text || "(sem body)");      if (!res.ok) {       console.error("❌ Supabase retornou erro:", res.status, text);     }   } catch (err) {     console.error("Supabase sync failed", err);   } }
-  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return; // not configured
-
-  try {
-   const payload = {
-  timestamp: trade.timestamp,
-  date: trade.date,
-  pair: trade.pair,
-  direction: trade.direction,
-  session: trade.session,
-  notes: trade.notes,
-  risk: trade.risk,
-  pnl: trade.pnl,
-  result: trade.result,
-  before_img: trade.beforeImg,
-  after_img: trade.afterImg,
-  score: trade.score,
-  level: trade.level,
-  active_confluences: trade.activeConfluences || []
-};
-
-    await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}`, {
-      method: "POST",
-      headers: {
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-        "Content-Type": "application/json",
-        Prefer: "resolution=merge-duplicates"
-      },
-      body: JSON.stringify(payload)
-    });
-  } catch (err) {
-    console.error("Supabase sync failed", err);
-  }
-}
-const STORAGE_KEY = "fzfx_trades_v3_en";
-
-function getHistory() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
-function saveHistory(list) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-  } catch {}
-}
-
-/* ====== SAVE TRADE ====== */
-saveBtn.addEventListener("click", () => {
-  const { total, activeIds } = calculateTotal();
-  const info = describeLevel(total);
-
-  if (total === 0 && !confirm("Score is 0%. Are you sure you want to save this trade?")) return;
-
-  const now = new Date();
-  const chosenDate = dateInput.value ? new Date(dateInput.value + "T00:00:00") : now;
-
-  const history = getHistory();
-
-  const trade = {
-    id: Date.now().toString(),
-    timestamp: now.getTime(),
-    date: chosenDate.toISOString(),
-    pair: (pairInput.value || "").trim(),
-    direction: directionInput.value || "",
-    session: (sessionInput.value || "").trim(),
-    notes: (notesInput.value || "").trim(),
-    risk: (riskInput.value || "").trim(),
-    pnl: (pnlInput.value || "").trim(),
-    result: resultInput.value || "",
-    beforeImg: (beforeImgInput.value || "").trim(),
-    afterImg: (afterImgInput.value || "").trim(),
-    score: total,
-    level: info.level,
-    activeConfluences: activeIds.map(id => {
-      const c = confluences.find(x=>x.id===id);
-      return c ? c.label : id;
-    })
-  };
-
-  history.push(trade);
-  saveHistory(history);
-  syncTradeToSupabase(trade);
-  renderHistory(currentFilter);
-  renderDashboard();
-
-  saveBtn.textContent = "Saved ✅";
-  setTimeout(()=> saveBtn.textContent = "Save this setup", 1300);
-});
-
-/* ====== HISTORY LIST ====== */
-let currentFilter = "ALL";
-
-function renderHistory(filter = "ALL") {
-  currentFilter = filter;
-  const history = getHistory().sort((a,b)=> b.timestamp - a.timestamp);
-  historyList.innerHTML = "";
-
-  const filtered = history.filter(t => {
-    if (filter === "ALL") return true;
-    if (filter === "WIN") return t.result === "Gain";
-    if (filter === "LOSS") return t.result === "Loss";
-    if (filter === "BE") return t.result === "Break-even";
-    if (filter === "NE") return t.result === "Not executed";
-    return true;
-  });
-
-  if (!filtered.length) {
-    historyList.innerHTML = "<div class='hint'>No trades for this filter yet.</div>";
-    return;
-  }
-
-  filtered.forEach(trade => {
-    const div = document.createElement("div");
-    div.className = "trade-card";
-
-    const infoLevel = describeLevel(trade.score);
-
-    let resultClass = "result-ne", resultText = trade.result || "N/A";
-    if (trade.result === "Gain") { resultClass = "result-win"; resultText = "WIN"; }
-    else if (trade.result === "Loss") { resultClass = "result-loss"; resultText = "LOSS"; }
-    else if (trade.result === "Break-even") { resultClass = "result-be"; resultText = "BE"; }
-
-    const date = new Date(trade.date || trade.timestamp);
-    const dateStr = date.toLocaleDateString("en-GB",{ day:"2-digit", month:"2-digit", year:"numeric" });
-
-    div.innerHTML = `
-      <div class="trade-top">
-        <div>
-          <div class="pair">${trade.pair || "No pair"}</div>
-          <div class="meta-line">${dateStr} • ${trade.session || "Session not set"}</div>
-        </div>
-        <div style="text-align:right;">
-          <div class="result-pill ${resultClass}">${resultText}</div>
-          <div style="font-size:10px;color:#9fb7d8;">${trade.score}% • ${infoLevel.level}</div>
-        </div>
-      </div>
-      <div class="meta-line">
-        Direction: <span style="color:#c6e2ff;">${trade.direction || "-"}</span> • Risk: <span style="color:#c6e2ff;">${trade.risk || "-"}</span>
-      </div>
-      <div class="meta-line">
-        P&L: <span style="color:${(trade.pnl||'').trim().startsWith('-') ? '#ffb3b3' : '#9dffbf'};">${trade.pnl || "-"}</span>
-      </div>
-      <div class="notes-preview"><strong>Notes:</strong> ${(trade.notes || "No notes.").slice(0,120)}${trade.notes && trade.notes.length>120 ? "..." : ""}</div>
-      <div class="notes-preview"><strong>Confluences:</strong> ${trade.activeConfluences && trade.activeConfluences.length ? trade.activeConfluences.join(", ") : "None"}</div>
-      <div class="card-actions">
-        <button class="btn-small view" data-id="${trade.id}">View</button>
-        <button class="btn-small update" data-id="${trade.id}">Update</button>
-        <button class="btn-small delete" data-id="${trade.id}">Delete</button>
-      </div>
-    `;
-    historyList.appendChild(div);
-  });
-
-  historyList.querySelectorAll(".btn-small.view").forEach(btn=>{
-    btn.addEventListener("click", ()=>openModal(btn.dataset.id));
-  });
-  historyList.querySelectorAll(".btn-small.delete").forEach(btn=>{
-    btn.addEventListener("click", ()=>deleteTrade(btn.dataset.id));
-  });
-  historyList.querySelectorAll(".btn-small.update").forEach(btn=>{
-    btn.addEventListener("click", ()=>loadTradeToForm(btn.dataset.id));
-  });
-}
-
-function deleteTrade(id) {
-  if (!confirm("Delete this trade from history?")) return;
-  let history = getHistory();
-  history = history.filter(t=> t.id !== id);
-  saveHistory(history);
-  renderHistory(currentFilter);
-  renderDashboard();
-}
-
-function loadTradeToForm(id) {
-  const history = getHistory();
-  const trade = history.find(t=> t.id === id);
-  if (!trade) return;
-
-  pairInput.value = trade.pair || "";
-  directionInput.value = trade.direction || "";
-  sessionInput.value = trade.session || "";
-  notesInput.value = trade.notes || "";
-  riskInput.value = trade.risk || "";
-  pnlInput.value = trade.pnl || "";
-  resultInput.value = trade.result || "";
-  beforeImgInput.value = trade.beforeImg || "";
-  afterImgInput.value = trade.afterImg || "";
-  if (trade.date) {
-    try {
-      const d = new Date(trade.date);
-      dateInput.value = d.toISOString().slice(0,10);
-    } catch { dateInput.value = ""; }
-  } else {
-    dateInput.value = "";
-  }
-
-  document.querySelectorAll(".tab-btn").forEach(btn=>{
-    btn.classList.remove("active");
-    if (btn.dataset.tab === "checklist") btn.classList.add("active");
-  });
-  document.querySelectorAll(".tab-panel").forEach(p=>p.classList.remove("active"));
-  document.getElementById("panel-checklist").classList.add("active");
-  window.scrollTo({top:0, behavior:"smooth"});
-}
-
-/* ====== DETAIL MODAL ====== */
-function openModal(id) {
-  const history = getHistory();
-  const t = history.find(x=>x.id===id);
-  if (!t) return;
-  const infoLevel = describeLevel(t.score);
-  const date = new Date(t.date || t.timestamp);
-  const dateStr = date.toLocaleString("en-GB",{ day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" });
-
-  const mapResult = () => {
-    if (t.result === "Gain") return "WIN (TP)";
-    if (t.result === "Loss") return "LOSS (SL)";
-    if (t.result === "Break-even") return "BREAK-EVEN";
-    if (t.result === "Not executed") return "Not executed";
-    return "N/A";
-  };
-
-  modalContent.innerHTML = `
-    <div class="modal-grid">
-      <div>
-        <div class="modal-label">Pair / Asset</div>
-        <div class="modal-value">${t.pair || "-"}</div>
-      </div>
-      <div>
-        <div class="modal-label">Direction</div>
-        <div class="modal-value">${t.direction || "-"}</div>
-      </div>
-      <div>
-        <div class="modal-label">Date</div>
-        <div class="modal-value">${dateStr}</div>
-      </div>
-      <div>
-        <div class="modal-label">Session</div>
-        <div class="modal-value">${t.session || "-"}</div>
-      </div>
-      <div>
-        <div class="modal-label">Score</div>
-        <div class="modal-value">${t.score}% • ${infoLevel.level}</div>
-      </div>
-      <div>
-        <div class="modal-label">Outcome</div>
-        <div class="modal-value">${mapResult()}</div>
-      </div>
-      <div>
-        <div class="modal-label">Risk</div>
-        <div class="modal-value">${t.risk || "-"}</div>
-      </div>
-      <div>
-        <div class="modal-label">P&L</div>
-        <div class="modal-value">${t.pnl || "-"}</div>
-      </div>
-    </div>
-
-    <div class="modal-section-title">Notes</div>
-    <div class="modal-notes">${(t.notes || "No notes.").replace(/\n/g,"<br>")}</div>
-
-    <div class="modal-section-title">Confluences marked</div>
-    <div class="modal-notes">${t.activeConfluences && t.activeConfluences.length ? t.activeConfluences.join(", ") : "None"}</div>
-
-    <div class="modal-section-title">Chart images (links)</div>
-    <div class="link-row">
-      <div><span class="modal-label">Before</span><br>${
-        t.beforeImg ? `<a href="${t.beforeImg}" target="_blank" class="chart-link">${t.beforeImg}</a>` : "<span style='font-size:10px;color:#7ea0c0;'>No link saved.</span>"
-      }</div>
-      <div><span class="modal-label">After</span><br>${
-        t.afterImg ? `<a href="${t.afterImg}" target="_blank" class="chart-link">${t.afterImg}</a>` : "<span style='font-size:10px;color:#7ea0c0;'>No link saved.</span>"
-      }</div>
-    </div>
-  `;
-
-  modalBackdrop.style.display = "flex";
-}
-modalCloseBtn.addEventListener("click", ()=> modalBackdrop.style.display = "none");
-modalBackdrop.addEventListener("click", (e)=> {
-  if (e.target === modalBackdrop) modalBackdrop.style.display = "none";
-});
-
-/* ====== FILTER BUTTONS ====== */
-filterButtons.forEach(btn=>{
-  btn.addEventListener("click", ()=>{
-    filterButtons.forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    const filter = btn.dataset.filter;
-    renderHistory(filter);
-  });
-});
-
-/* ====== CLEAR HISTORY ====== */
-clearHistoryBtn.addEventListener("click", ()=>{
-  if (!confirm("Clear ALL saved trades from this device?")) return;
-  saveHistory([]);
-  renderHistory(currentFilter);
-  renderDashboard();
-});
-
-/* ====== DASHBOARD ====== */
-let currentMonth = (new Date()).getMonth();
-let currentYear = (new Date()).getFullYear();
-
-function parseNumericPnl(pnlStr) {
-  if (!pnlStr) return 0;
-  const cleaned = pnlStr.replace(/[^\d\-\.,]/g,"").replace(",",".");
-  const num = parseFloat(cleaned);
-  return isNaN(num) ? 0 : num;
-}
-
-function renderDashboard() {
-  const history = getHistory();
-
-  const totalTrades = history.length;
-  const wins = history.filter(t=>t.result==="Gain").length;
-  const losses = history.filter(t=>t.result==="Loss").length;
-  const winRate = totalTrades ? Math.round((wins/totalTrades)*100) : 0;
-
-  const pnlByPair = {};
-  let totalPnlValue = 0;
-  history.forEach(t=>{
-    const num = parseNumericPnl(t.pnl);
-    totalPnlValue += num;
-    const key = t.pair || "N/A";
-    pnlByPair[key] = (pnlByPair[key] || 0) + num;
-  });
-
-  let bestPair = "-", bestVal = -Infinity;
-  let worstPair = "-", worstVal = Infinity;
-  Object.entries(pnlByPair).forEach(([pair, val])=>{
-    if (val > bestVal) { bestVal = val; bestPair = pair; }
-    if (val < worstVal) { worstVal = val; worstPair = pair; }
-  });
-
-  statTotal.textContent = totalTrades;
-  statWinRate.textContent = winRate + "%";
-  statBestPair.textContent = bestPair;
-  statWorstPair.textContent = worstPair;
-  statTotalPnl.textContent = totalTrades ? (totalPnlValue >=0 ? "+"+totalPnlValue.toFixed(2) : totalPnlValue.toFixed(2)) : "-";
-
-  recentList.innerHTML = "";
-  const sorted = history.slice().sort((a,b)=>b.timestamp - a.timestamp).slice(0,8);
-  if (!sorted.length) {
-    recentList.innerHTML = "<div class='hint'>No trades yet.</div>";
-  } else {
-    sorted.forEach(t=>{
-      const d = new Date(t.date || t.timestamp);
-      const dateStr = d.toLocaleDateString("en-GB",{ day:"2-digit", month:"2-digit" });
-      const label = `${t.pair || "No pair"} • ${t.result || "N/A"} • ${t.score}%`;
-      const pnl = t.pnl || "-";
-      const row = document.createElement("div");
-      row.className = "recent-item";
-      row.innerHTML = `<span>${label}</span><span>${dateStr} • ${pnl}</span>`;
-      recentList.appendChild(row);
-    });
-  }
-
-  renderCalendar();
-}
-
-function renderCalendar() {
-  const history = getHistory();
-  calendarGrid.innerHTML = "";
-
-  const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  calendarMonthLabel.textContent = monthNames[currentMonth] + " " + currentYear;
-
-  const firstDay = new Date(currentYear, currentMonth, 1);
-  const startWeekday = firstDay.getDay();
-  const daysInMonth = new Date(currentYear, currentMonth+1, 0).getDate();
-
-  const weekdays = ["S","M","T","W","T","F","S"];
-  weekdays.forEach(d=>{
-    const head = document.createElement("div");
-    head.className = "cal-day-header";
-    head.textContent = d;
-    calendarGrid.appendChild(head);
-  });
-
-  for (let i=0;i<startWeekday;i++) {
-    const cell = document.createElement("div");
-    calendarGrid.appendChild(cell);
-  }
-
-  const pnlByDay = {};
-  history.forEach(t=>{
-    const d = new Date(t.date || t.timestamp);
-    if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
-      const day = d.getDate();
-      pnlByDay[day] = (pnlByDay[day] || 0) + parseNumericPnl(t.pnl);
-    }
-  });
-
-  for (let day=1; day<=daysInMonth; day++) {
-    const cell = document.createElement("div");
-    cell.className = "cal-cell";
-    const dateSpan = document.createElement("div");
-    dateSpan.className = "cal-date";
-    dateSpan.textContent = day;
-    cell.appendChild(dateSpan);
-
-    const pnl = pnlByDay[day] || 0;
-    const pnlSpan = document.createElement("div");
-    pnlSpan.className = "cal-pnl";
-    if (!pnl && pnlByDay[day] === undefined) {
-      pnlSpan.textContent = "";
-    } else if (pnl > 0) {
-      pnlSpan.classList.add("positive");
-      pnlSpan.textContent = "+"+pnl.toFixed(2);
-    } else if (pnl < 0) {
-      pnlSpan.classList.add("negative");
-      pnlSpan.textContent = pnl.toFixed(2);
-    } else {
-      pnlSpan.classList.add("neutral");
-      pnlSpan.textContent = "0.00";
-    }
-    cell.appendChild(pnlSpan);
-
-    calendarGrid.appendChild(cell);
-  }
-}
-
-prevMonthBtn.addEventListener("click", ()=>{
-  currentMonth--;
-  if (currentMonth<0){ currentMonth=11; currentYear--; }
-  renderCalendar();
-});
-nextMonthBtn.addEventListener("click", ()=>{
-  currentMonth++;
-  if (currentMonth>11){ currentMonth=0; currentYear++; }
-  renderCalendar();
-});
-todayMonthBtn.addEventListener("click", ()=>{
-  const now = new Date();
-  currentMonth = now.getMonth();
-  currentYear = now.getFullYear();
-  renderCalendar();
-});
-
-/* ====== TABS ====== */
-document.querySelectorAll(".tab-btn").forEach(btn=>{
-  btn.addEventListener("click", ()=>{
-    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    const tab = btn.dataset.tab;
-    document.querySelectorAll(".tab-panel").forEach(p=>p.classList.remove("active"));
-    document.getElementById("panel-" + tab).classList.add("active");
-    if (tab === "history") {
-      renderHistory(currentFilter);
-    } else if (tab === "dashboard") {
-      renderDashboard();
-    }
-  });
-});
-
-/* INIT */
-renderCards();
-updateTotal();
-renderHistory("ALL");
-renderDashboard();
-</script>
+    renderCards(); updateTotal(); renderHistory("ALL"); renderDashboard();
+  </script>
 </body>
 </html>
