@@ -178,6 +178,7 @@ async function init() {
   currentUser = session.user;
 }
 
+<script>
 async function startPayment() {
   const btn = document.getElementById('btnPay');
   btn.disabled = true;
@@ -194,34 +195,48 @@ async function startPayment() {
         price_amount: 4.99,
         price_currency: 'usd',
         pay_currency: 'usdttrc20',
-        order_id: `fzfx_${Date.now()}`,
+        order_id: `fzfx_${currentUser.id}_${Date.now()}`,
         order_description: 'FZFX Pro Subscription',
-        success_url: `${window.location.origin}/app.html`,
-        cancel_url: `${window.location.origin}/subscribe.html`
+        success_url: `${window.location.origin}/subscribe.html?paid=success`,
+        cancel_url: `${window.location.origin}/subscribe.html?paid=cancel`
       })
     });
 
-    const data = await response.json();
+    const raw = await response.text();
+    let data = {};
+
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      data = { raw };
+    }
+
+    console.log('NOWPayments status:', response.status);
+    console.log('NOWPayments response:', data);
+
+    if (!response.ok) {
+      throw new Error(
+        data.message ||
+        data.error ||
+        data.raw ||
+        `HTTP ${response.status}`
+      );
+    }
 
     if (data.invoice_url) {
       window.location.href = data.invoice_url;
-    } else {
-      throw new Error('Payment failed');
+      return;
     }
 
+    throw new Error('Invoice created without invoice_url.');
+
   } catch (err) {
-    alert(err.message);
+    console.error('Payment error:', err);
+    alert('Payment error: ' + err.message);
     btn.disabled = false;
     btn.textContent = '💳 Subscribe — $4.99/mo';
   }
 }
-
-async function logout() {
-  await sb.auth.signOut();
-  window.location.href = 'login.html';
-}
-
-init();
 </script>
 
 </body>
