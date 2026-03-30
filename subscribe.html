@@ -2,325 +2,227 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>FZFX Pro - Choose Your Plan</title>
+  <title>FZFX Pro - Subscribe</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif; }
+
     body {
       min-height: 100vh;
       background: radial-gradient(circle at top, #1b2a3a 0, #050810 55%, #020308 100%);
       color: #e8f5ff;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
-      padding: 40px 24px;
+      align-items: center;
+      padding: 24px;
     }
-    .container { width: 100%; max-width: 960px; }
 
-    .header { text-align: center; margin-bottom: 48px; }
-    .header h1 { font-size: 30px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #b2f5ff; margin-bottom: 10px; }
-    .header p { font-size: 15px; color: #7ea0c0; }
+    .container { width: 100%; max-width: 420px; text-align: center; }
 
-    .plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; margin-bottom: 40px; }
+    .header { margin-bottom: 40px; }
+    .header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #b2f5ff;
+      margin-bottom: 10px;
+    }
+    .header p { font-size: 14px; color: #7ea0c0; }
 
     .plan {
       background: rgba(3,10,20,0.96);
       border-radius: 20px;
-      padding: 32px 24px;
-      border: 1px solid rgba(120,220,255,0.15);
-      text-align: center;
-      position: relative;
-      transition: transform 0.2s, border-color 0.2s;
-    }
-    .plan:hover { transform: translateY(-4px); border-color: rgba(120,220,255,0.3); }
-    .plan.popular { border-color: #49e0b7; box-shadow: 0 0 40px rgba(73,224,183,0.12); }
-
-    .badge-popular {
-      position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
-      background: linear-gradient(90deg,#11c5a5,#46ff88); color: #021110;
-      padding: 5px 18px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+      padding: 36px 28px;
+      border: 1px solid #49e0b7;
+      box-shadow: 0 0 40px rgba(73,224,183,0.15);
     }
 
-    .plan-name { font-size: 18px; font-weight: 600; color: #e8f5ff; margin-bottom: 6px; }
-    .plan-price { font-size: 46px; font-weight: 800; color: #b2ffe4; line-height: 1; }
-    .plan-price span { font-size: 15px; color: #7ea0c0; font-weight: 400; }
-    .plan-period { font-size: 12px; color: #7ea0c0; margin-top: 4px; margin-bottom: 20px; }
-
-    .plan-features { list-style: none; margin: 0 0 24px; text-align: left; }
-    .plan-features li {
-      padding: 8px 0; font-size: 13px; color: #9fb7d8;
-      border-bottom: 1px solid rgba(120,220,255,0.08);
-      display: flex; align-items: center; gap: 10px;
-    }
-    .plan-features li::before { content: "✓"; color: #46ff88; font-weight: 700; flex-shrink: 0; }
-
-    .btn-plan {
-      width: 100%; padding: 14px; border-radius: 999px; border: none;
-      font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;
-    }
-    .btn-plan.free {
-      background: #050b15; border: 1px solid rgba(120,220,255,0.3); color: #e8f5ff;
-    }
-    .btn-plan.free:hover { background: rgba(120,220,255,0.08); }
-    .btn-plan.paid {
-      background: linear-gradient(90deg,#11c5a5,#46ff88); color: #021110;
-      box-shadow: 0 8px 22px rgba(0,255,153,0.3);
-    }
-    .btn-plan.paid:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(0,255,153,0.4); }
-    .btn-plan:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
-
-    .payment-badge {
-      margin-top: 12px; font-size: 11px; color: #5a8a6a;
-      display: flex; align-items: center; justify-content: center; gap: 5px;
+    .badge {
+      background: linear-gradient(90deg,#11c5a5,#46ff88);
+      color: #021110;
+      padding: 6px 18px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 18px;
+      display: inline-block;
     }
 
-    /* Pending box */
-    .pending-box {
-      display: none;
-      background: rgba(255,193,79,0.08);
-      border: 1px solid rgba(255,193,79,0.35);
-      border-radius: 16px;
-      padding: 28px 24px;
-      text-align: center;
-      margin-bottom: 32px;
+    .plan-name { font-size: 18px; margin-bottom: 6px; }
+    .plan-price {
+      font-size: 46px;
+      font-weight: 800;
+      color: #b2ffe4;
     }
-    .pending-box h3 { color: #ffd68b; font-size: 18px; margin-bottom: 10px; }
-    .pending-box p { color: #c8a84b; font-size: 13px; line-height: 1.6; margin-bottom: 16px; }
-    .btn-check {
-      padding: 10px 28px; border-radius: 999px; border: 1px solid rgba(255,193,79,0.5);
-      background: rgba(255,193,79,0.12); color: #ffd68b; font-size: 13px;
-      font-weight: 600; cursor: pointer;
-    }
-    .btn-check:hover { background: rgba(255,193,79,0.2); }
 
-    /* Info strip */
-    .info-strip {
-      background: rgba(17,197,165,0.06);
-      border: 1px solid rgba(17,197,165,0.2);
-      border-radius: 12px;
-      padding: 16px 20px;
-      font-size: 12px;
+    .plan-period {
+      font-size: 13px;
       color: #7ea0c0;
+      margin-bottom: 22px;
+    }
+
+    .features {
+      list-style: none;
+      margin-bottom: 26px;
+      text-align: left;
+    }
+
+    .features li {
+      padding: 8px 0;
+      font-size: 13px;
+      color: #9fb7d8;
+      display: flex;
+      gap: 10px;
+    }
+
+    .features li::before {
+      content: "✓";
+      color: #46ff88;
+      font-weight: 700;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 15px;
+      border-radius: 999px;
+      border: none;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      background: linear-gradient(90deg,#11c5a5,#46ff88);
+      color: #021110;
+      box-shadow: 0 8px 22px rgba(0,255,153,0.3);
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(0,255,153,0.4);
+    }
+
+    .payment {
+      margin-top: 12px;
+      font-size: 11px;
+      color: #5a8a6a;
+    }
+
+    .loading {
+      display: none;
       text-align: center;
-      margin-bottom: 24px;
-      line-height: 1.7;
+      color: #7ea0c0;
+      margin-top: 40px;
     }
-    .info-strip strong { color: #b2ffe4; }
 
-    .logout-link {
-      display: block; text-align: center;
-      font-size: 12px; color: #4a6480; cursor: pointer;
-      background: none; border: none; width: 100%; margin-top: 8px;
+    .logout {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #4a6480;
+      cursor: pointer;
+      background: none;
+      border: none;
     }
-    .logout-link:hover { color: #ffaaaa; }
 
-    .loading-screen {
-      display: none; text-align: center; padding: 80px 24px; color: #7ea0c0;
-    }
+    .logout:hover { color: #ffaaaa; }
   </style>
 </head>
 <body>
 
-  <div class="loading-screen" id="loadingScreen">Loading your account...</div>
+<div class="container">
 
-  <div class="container" id="mainContent" style="display:none;">
-
-    <div class="header">
-      <h1>FZFX Pro</h1>
-      <p>Choose your plan to unlock full access</p>
-    </div>
-
-    <!-- Pending payment notice -->
-    <div class="pending-box" id="pendingBox">
-      <h3>⏳ Payment Submitted</h3>
-      <p>
-        Your payment is being processed.<br>
-        Access will be activated within a few minutes after confirmation.<br><br>
-        <strong>Email:</strong> <span id="pendingEmail"></span><br>
-        Contact <strong>support@fzfxpro.com</strong> if not activated within 10 minutes.
-      </p>
-      <button class="btn-check" onclick="checkActivation()">Check Activation Status</button>
-    </div>
-
-    <!-- Plans -->
-    <div class="plans" id="plansGrid">
-
-      <!-- Free -->
-      <div class="plan">
-        <div class="plan-name">Free</div>
-        <div class="plan-price">$0</div>
-        <div class="plan-period">forever</div>
-        <ul class="plan-features">
-          <li>Full checklist access</li>
-          <li>Trade journal (local only)</li>
-          <li>Dashboard & calendar</li>
-          <li>Limited to 1 device</li>
-        </ul>
-        <button class="btn-plan free" onclick="goToApp()">Continue Free</button>
-      </div>
-
-      <!-- Pro -->
-      <div class="plan popular">
-        <div class="badge-popular">MOST POPULAR</div>
-        <div class="plan-name">Pro</div>
-        <div class="plan-price">$9<span> USD</span></div>
-        <div class="plan-period">per month</div>
-        <ul class="plan-features">
-          <li>Everything in Free</li>
-          <li>Cloud sync & backup</li>
-          <li>Unlimited trade history</li>
-          <li>Advanced analytics</li>
-          <li>Export CSV / PDF</li>
-          <li>Priority support</li>
-        </ul>
-        <button class="btn-plan paid" id="btnPro" onclick="startPayment('pro', 9)">
-          💳 Subscribe — $9/mo
-        </button>
-        <div class="payment-badge">⚡ Card → you pay · USDT → we receive</div>
-      </div>
-
-      <!-- Elite -->
-      <div class="plan">
-        <div class="plan-name">Elite</div>
-        <div class="plan-price">$19<span> USD</span></div>
-        <div class="plan-period">per month</div>
-        <ul class="plan-features">
-          <li>Everything in Pro</li>
-          <li>AI trade insights</li>
-          <li>Backtesting tools</li>
-          <li>API access</li>
-          <li>1-on-1 coaching session</li>
-        </ul>
-        <button class="btn-plan paid" id="btnElite" onclick="startPayment('elite', 19)">
-          💳 Subscribe — $19/mo
-        </button>
-        <div class="payment-badge">⚡ Card → you pay · USDT → we receive</div>
-      </div>
-
-    </div>
-
-    <div class="info-strip">
-      Pay securely with <strong>Credit or Debit Card</strong> via NOWPayments.<br>
-      Your subscription is processed automatically. No hidden fees.
-    </div>
-
-    <button class="logout-link" onclick="logout()">← Sign out</button>
-
+  <div class="header">
+    <h1>FZFX Pro</h1>
+    <p>Unlock full access to your trading system</p>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    // =====================================================
-    // CONFIG
-    // =====================================================
-    const SUPABASE_URL = 'https://txvcrqomdiquoupfmnng.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR4dmNycW9tZGlxdW91cGZtbm5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MzYxNzYsImV4cCI6MjA5MDMxMjE3Nn0.QdMaX5cy8a3pqTcKK7f5-QPvsrhjDM2YXVeZ1WEfbI4';
-    const NOWPAYMENTS_API_KEY = '1G447R8-43SMEPJ-HPMN2D9-7945GPM';
-    // =====================================================
+  <div class="plan">
+    <div class="badge">BEST VALUE</div>
+    <div class="plan-name">Pro Access</div>
+    <div class="plan-price">$4.99</div>
+    <div class="plan-period">per month</div>
 
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    let currentUser = null;
+    <ul class="features">
+      <li>Unlimited trade journal</li>
+      <li>Advanced analytics</li>
+      <li>Cloud sync & backup</li>
+      <li>Validator system</li>
+      <li>Performance tracking</li>
+      <li>Priority support</li>
+    </ul>
 
-    async function init() {
-      document.getElementById('loadingScreen').style.display = 'block';
+    <button class="btn" id="btnPay" onclick="startPayment()">
+      💳 Subscribe — $4.99/mo
+    </button>
 
-      const { data: { session } } = await sb.auth.getSession();
-      if (!session) { window.location.href = 'login.html'; return; }
-      currentUser = session.user;
+    <div class="payment">⚡ Secure payment via card (USDT processed)</div>
+  </div>
 
-      // Check if already active
-      const { data: profile } = await sb.from('profiles')
-        .select('plan, status')
-        .eq('id', currentUser.id)
-        .single();
+  <button class="logout" onclick="logout()">← Sign out</button>
 
-      if (profile && profile.status === 'active' && profile.plan !== 'free') {
-        // Already subscribed — go to app
-        window.location.href = 'app.html';
-        return;
-      }
+  <div class="loading" id="loading">Preparing payment...</div>
 
-      // Show pending box if payment submitted
-      if (profile && profile.status === 'pending') {
-        document.getElementById('pendingBox').style.display = 'block';
-        document.getElementById('pendingEmail').textContent = currentUser.email;
-      }
+</div>
 
-      document.getElementById('loadingScreen').style.display = 'none';
-      document.getElementById('mainContent').style.display = 'block';
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://txvcrqomdiquoupfmnng.supabase.co';
+const SUPABASE_ANON_KEY = 'SUA_KEY_AQUI';
+const NOWPAYMENTS_API_KEY = 'SUA_API_AQUI';
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let currentUser = null;
+
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return window.location.href = 'login.html';
+  currentUser = session.user;
+}
+
+async function startPayment() {
+  const btn = document.getElementById('btnPay');
+  btn.disabled = true;
+  btn.textContent = 'Processing...';
+
+  try {
+    const response = await fetch('https://api.nowpayments.io/v1/invoice', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': NOWPAYMENTS_API_KEY
+      },
+      body: JSON.stringify({
+        price_amount: 4.99,
+        price_currency: 'usd',
+        pay_currency: 'usdttrc20',
+        order_id: `fzfx_${Date.now()}`,
+        order_description: 'FZFX Pro Subscription',
+        success_url: `${window.location.origin}/app.html`,
+        cancel_url: `${window.location.origin}/subscribe.html`
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.invoice_url) {
+      window.location.href = data.invoice_url;
+    } else {
+      throw new Error('Payment failed');
     }
 
-    async function startPayment(plan, amount) {
-      const btn = document.getElementById('btn' + plan.charAt(0).toUpperCase() + plan.slice(1));
-      btn.disabled = true;
-      btn.textContent = 'Preparing payment...';
+  } catch (err) {
+    alert(err.message);
+    btn.disabled = false;
+    btn.textContent = '💳 Subscribe — $4.99/mo';
+  }
+}
 
-      try {
-        const response = await fetch('https://api.nowpayments.io/v1/invoice', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': NOWPAYMENTS_API_KEY
-          },
-          body: JSON.stringify({
-            price_amount: amount,
-            price_currency: 'usd',
-            pay_currency: 'usdttrc20',
-            order_id: `fzfx_${currentUser.id}_${plan}_${Date.now()}`,
-            order_description: `FZFX Pro - ${plan} plan`,
-            success_url: `${window.location.origin}/subscribe.html`,
-            cancel_url: `${window.location.origin}/subscribe.html`
-          })
-        });
+async function logout() {
+  await sb.auth.signOut();
+  window.location.href = 'login.html';
+}
 
-        const data = await response.json();
+init();
+</script>
 
-        if (data.invoice_url) {
-          // Mark as pending in Supabase
-          await sb.from('profiles').update({
-            plan: plan,
-            status: 'pending',
-            updated_at: new Date().toISOString()
-          }).eq('id', currentUser.id);
-
-          // Open NOWPayments checkout
-          window.location.href = data.invoice_url;
-
-        } else {
-          throw new Error(data.message || 'Could not create invoice.');
-        }
-
-      } catch (err) {
-        alert('Payment error: ' + err.message);
-        btn.disabled = false;
-        btn.textContent = plan === 'pro' ? '💳 Subscribe — $9/mo' : '💳 Subscribe — $19/mo';
-      }
-    }
-
-    async function checkActivation() {
-      const { data: profile } = await sb.from('profiles')
-        .select('plan, status')
-        .eq('id', currentUser.id)
-        .single();
-
-      if (profile && profile.status === 'active') {
-        alert('✅ Your plan is active! Redirecting...');
-        window.location.href = 'app.html';
-      } else {
-        alert('⏳ Not activated yet. Please wait a few minutes or contact support@fzfxpro.com with your email:\n\n' + currentUser.email);
-      }
-    }
-
-    function goToApp() {
-      window.location.href = 'app.html';
-    }
-
-    async function logout() {
-      await sb.auth.signOut();
-      window.location.href = 'login.html';
-    }
-
-    init();
-  </script>
 </body>
 </html>
