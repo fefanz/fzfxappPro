@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FZFX Pro - Sign Up</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif; }
+    body { min-height: 100vh; background: radial-gradient(circle at top, #1b2a3a 0, #050810 55%, #020308 100%); color: #e8f5ff; display: flex; justify-content: center; align-items: center; padding: 24px; }
+    .container { width: 100%; max-width: 420px; background: rgba(3,10,20,0.96); border-radius: 20px; padding: 40px 32px; box-shadow: 0 24px 60px rgba(0,0,0,0.8); border: 1px solid rgba(120,220,255,0.15); }
+    .logo { text-align: center; margin-bottom: 32px; }
+    .logo h1 { font-size: 28px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #b2f5ff; margin-bottom: 8px; }
+    .logo p { font-size: 13px; color: #7ea0c0; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-size: 12px; color: #8fb4d8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.08em; }
+    input { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid #253347; background: #050b15; color: #e8f5ff; font-size: 14px; outline: none; }
+    input:focus { border-color: #49e0b7; box-shadow: 0 0 0 1px #49e0b733; }
+    .btn-primary { width: 100%; padding: 14px; border-radius: 999px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; background: linear-gradient(90deg,#11c5a5,#46ff88); color: #021110; box-shadow: 0 8px 22px rgba(0,255,153,0.35); margin-top: 10px; }
+    .btn-primary:disabled { opacity: 0.6; }
+    .links { text-align: center; margin-top: 24px; font-size: 13px; color: #7ea0c0; }
+    .links a { color: #49e0b7; text-decoration: none; }
+    .error { background: rgba(255,87,87,0.15); border: 1px solid rgba(255,87,87,0.4); color: #ffb3b3; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
+    .success { background: rgba(17,197,165,0.15); border: 1px solid rgba(17,197,165,0.4); color: #9dffd4; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <h1>FZFX Pro</h1>
+      <p>Create your account</p>
+    </div>
+
+    <div id="errorMsg" class="error"></div>
+    <div id="successMsg" class="success"></div>
+
+    <form id="registerForm">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="seu@email.com" required />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Min 6 characters" minlength="6" required />
+      </div>
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" id="confirmPassword" placeholder="••••••••" required />
+      </div>
+      <button type="submit" class="btn-primary" id="registerBtn">Create Account</button>
+    </form>
+
+    <div class="links">
+      <p>Already have an account? <a href="login.html">Sign in</a></p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://txvcrqomdiquoupfmnng.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable__35vZ2yutz4hEH0z0x7sbw_Ukpf0eOe';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (password !== confirmPassword) {
+        document.getElementById('errorMsg').textContent = 'Passwords do not match';
+        document.getElementById('errorMsg').style.display = 'block';
+        return;
+      }
+
+      const btn = document.getElementById('registerBtn');
+      btn.disabled = true;
+      btn.textContent = 'Creating...';
+
+      const { data, error } = await supabase.auth.signUp({ email, password });
+
+      if (error) {
+        document.getElementById('errorMsg').textContent = error.message;
+        document.getElementById('errorMsg').style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Create Account';
+      } else {
+        document.getElementById('successMsg').textContent = 'Account created! Redirecting...';
+        document.getElementById('successMsg').style.display = 'block';
+        setTimeout(() => window.location.href = 'login.html', 2000);
+      }
+    });
+  </script>
+</body>
+</html>
