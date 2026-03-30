@@ -101,17 +101,16 @@
       box-shadow: 0 12px 28px rgba(0,255,153,0.4);
     }
 
+    .btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
     .payment {
       margin-top: 12px;
       font-size: 11px;
       color: #5a8a6a;
-    }
-
-    .loading {
-      display: none;
-      text-align: center;
-      color: #7ea0c0;
-      margin-top: 40px;
     }
 
     .logout {
@@ -129,7 +128,6 @@
 <body>
 
 <div class="container">
-
   <div class="header">
     <h1>FZFX Pro</h1>
     <p>Unlock full access to your trading system</p>
@@ -158,85 +156,90 @@
   </div>
 
   <button class="logout" onclick="logout()">← Sign out</button>
-
-  <div class="loading" id="loading">Preparing payment...</div>
-
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SUPABASE_URL = 'https://txvcrqomdiquoupfmnng.supabase.co';
-const SUPABASE_ANON_KEY = 'SUA_KEY_AQUI';
-const NOWPAYMENTS_API_KEY = 'SUA_API_AQUI';
+  const SUPABASE_URL = 'https://txvcrqomdiquoupfmnng.supabase.co';
+  const SUPABASE_ANON_KEY = 'SUA_KEY_AQUI';
+  const NOWPAYMENTS_API_KEY = 'SUA_API_AQUI';
 
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-let currentUser = null;
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  let currentUser = null;
 
-async function init() {
-  const { data: { session } } = await sb.auth.getSession();
-  if (!session) return window.location.href = 'login.html';
-  currentUser = session.user;
-}
-
-<script>
-async function startPayment() {
-  const btn = document.getElementById('btnPay');
-  btn.disabled = true;
-  btn.textContent = 'Processing...';
-
-  try {
-    const response = await fetch('https://api.nowpayments.io/v1/invoice', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': NOWPAYMENTS_API_KEY
-      },
-      body: JSON.stringify({
-        price_amount: 4.99,
-        price_currency: 'usd',
-        pay_currency: 'usdttrc20',
-        order_id: `fzfx_${currentUser.id}_${Date.now()}`,
-        order_description: 'FZFX Pro Subscription',
-        success_url: `${window.location.origin}/subscribe.html?paid=success`,
-        cancel_url: `${window.location.origin}/subscribe.html?paid=cancel`
-      })
-    });
-
-    const raw = await response.text();
-    let data = {};
-
-    try {
-      data = JSON.parse(raw);
-    } catch {
-      data = { raw };
-    }
-
-    console.log('NOWPayments status:', response.status);
-    console.log('NOWPayments response:', data);
-
-    if (!response.ok) {
-      throw new Error(
-        data.message ||
-        data.error ||
-        data.raw ||
-        `HTTP ${response.status}`
-      );
-    }
-
-    if (data.invoice_url) {
-      window.location.href = data.invoice_url;
+  async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) {
+      window.location.href = 'login.html';
       return;
     }
-
-    throw new Error('Invoice created without invoice_url.');
-
-  } catch (err) {
-    console.error('Payment error:', err);
-    alert('Payment error: ' + err.message);
-    btn.disabled = false;
-    btn.textContent = '💳 Subscribe — $4.99/mo';
+    currentUser = session.user;
   }
-}
+
+  async function startPayment() {
+    const btn = document.getElementById('btnPay');
+    btn.disabled = true;
+    btn.textContent = 'Processing...';
+
+    try {
+      const response = await fetch('https://api.nowpayments.io/v1/invoice', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': NOWPAYMENTS_API_KEY
+        },
+        body: JSON.stringify({
+          price_amount: 4.99,
+          price_currency: 'usd',
+          pay_currency: 'usdttrc20',
+          order_id: `fzfx_${currentUser?.id || 'guest'}_${Date.now()}`,
+          order_description: 'FZFX Pro Subscription',
+          success_url: `${window.location.origin}/subscribe.html?paid=success`,
+          cancel_url: `${window.location.origin}/subscribe.html?paid=cancel`
+        })
+      });
+
+      const raw = await response.text();
+      let data = {};
+
+      try {
+        data = JSON.parse(raw);
+      } catch {
+        data = { raw };
+      }
+
+      console.log('NOWPayments status:', response.status);
+      console.log('NOWPayments response:', data);
+
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+          data.error ||
+          data.raw ||
+          `HTTP ${response.status}`
+        );
+      }
+
+      if (data.invoice_url) {
+        window.location.href = data.invoice_url;
+        return;
+      }
+
+      throw new Error('Invoice created without invoice_url.');
+    } catch (err) {
+      console.error('Payment error:', err);
+      alert('Payment error: ' + err.message);
+      btn.disabled = false;
+      btn.textContent = '💳 Subscribe — $4.99/mo';
+    }
+  }
+
+  async function logout() {
+    await sb.auth.signOut();
+    window.location.href = 'login.html';
+  }
+
+  init();
 </script>
 
 </body>
