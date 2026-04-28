@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>FZFX Pro - Login</title>
+  <title>Protocol FZFX - Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif; }
@@ -22,14 +22,13 @@
     .links a { color: #49e0b7; text-decoration: none; }
     .links a:hover { text-decoration: underline; }
     .error { background: rgba(255,87,87,0.15); border: 1px solid rgba(255,87,87,0.4); color: #ffb3b3; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
-    .divider { text-align: center; margin: 20px 0 8px; font-size: 12px; color: #7ea0c0; }
     .reset-link { display: block; text-align: center; margin-top: 12px; font-size: 12px; color: #49e0b7; cursor: pointer; background: none; border: none; width: 100%; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="logo">
-      <h1>FZFX Pro</h1>
+      <h1>Protocol FZFX</h1>
       <p>Professional Trade Journal</p>
     </div>
 
@@ -56,12 +55,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // ====================================================
-    // CREDENCIAIS - atualize se resetar as chaves
-    // ====================================================
     const SUPABASE_URL = 'https://txvcrqomdiquoupfmnng.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR4dmNycW9tZGlxdW91cGZtbm5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MzYxNzYsImV4cCI6MjA5MDMxMjE3Nn0.QdMaX5cy8a3pqTcKK7f5-QPvsrhjDM2YXVeZ1WEfbI4';
-    // ====================================================
 
     const { createClient } = supabase;
     const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -74,10 +69,17 @@
       errorEl.style.display = 'block';
     }
 
-    // Se já estiver logado, vai direto pro app
+    // Se já estiver logado, verifica plano antes de redirecionar
     (async () => {
       const { data: { session } } = await sb.auth.getSession();
-      if (session) window.location.href = 'app.html';
+      if (session) {
+        const { data: profile } = await sb.from('profiles').select('plan, status').eq('id', session.user.id).single();
+        if (profile && profile.plan === 'pro' && profile.status === 'active') {
+          window.location.href = 'app.html';
+        } else {
+          window.location.href = 'subscribe.html';
+        }
+      }
     })();
 
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -98,18 +100,27 @@
         return;
       }
 
-      // Garantir que perfil existe
-      const { data: profile } = await sb.from('profiles').select('id').eq('id', data.user.id).single();
+      // Verificar perfil
+      const { data: profile } = await sb.from('profiles').select('id, plan, status').eq('id', data.user.id).single();
+
       if (!profile) {
+        // Perfil novo — criar como pending, não entra sem pagar
         await sb.from('profiles').insert({
           id: data.user.id,
           email: data.user.email,
           plan: 'free',
-          status: 'active'
+          status: 'pending'
         });
+        window.location.href = 'subscribe.html';
+        return;
       }
 
-      window.location.href = 'app.html';
+      // Só entra no app se tiver pro + active
+      if (profile.plan === 'pro' && profile.status === 'active') {
+        window.location.href = 'app.html';
+      } else {
+        window.location.href = 'subscribe.html';
+      }
     });
 
     document.getElementById('resetBtn').addEventListener('click', async () => {

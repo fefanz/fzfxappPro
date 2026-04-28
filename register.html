@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>FZFX Pro - Sign Up</title>
+  <title>Protocol FZFX - Sign Up</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif; }
@@ -28,7 +28,7 @@
 <body>
   <div class="container">
     <div class="logo">
-      <h1>FZFX Pro</h1>
+      <h1>Protocol FZFX</h1>
       <p>Create your account</p>
     </div>
 
@@ -58,12 +58,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // ====================================================
-    // CREDENCIAIS - atualize se resetar as chaves
-    // ====================================================
     const SUPABASE_URL = 'https://txvcrqomdiquoupfmnng.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR4dmNycW9tZGlxdW91cGZtbm5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MzYxNzYsImV4cCI6MjA5MDMxMjE3Nn0.QdMaX5cy8a3pqTcKK7f5-QPvsrhjDM2YXVeZ1WEfbI4';
-    // ====================================================
 
     const { createClient } = supabase;
     const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -100,17 +96,17 @@
         return;
       }
 
-      // Criar perfil automaticamente
+      // Criar perfil como pending — não entra no app sem pagar
       if (data.user) {
         await sb.from('profiles').insert({
           id: data.user.id,
           email: data.user.email,
           plan: 'free',
-          status: 'active'
+          status: 'pending'
         });
       }
 
-      successEl.textContent = 'Account created! Redirecting to login...';
+      successEl.textContent = 'Account created! Redirecting to subscription...';
       successEl.style.display = 'block';
       setTimeout(() => window.location.href = 'subscribe.html', 2000);
     });

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>FZFX Trade Validator</title>
+  <title>Protocol FZFX - Trade Validator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif; }
@@ -180,15 +180,22 @@
     .recent-item { font-size:10px; color:#c9e4ff; display:flex; justify-content:space-between; }
     .recent-item span:last-child { color:#9fb7d8; }
 
+    /* Loading guard */
+    #guardOverlay { position:fixed; inset:0; background:#020308; display:flex; align-items:center; justify-content:center; z-index:100; font-size:14px; color:#7ea0c0; }
+
     @media (max-width: 860px) { .notes-section { grid-template-columns: 1fr; } .dashboard-layout { grid-template-columns: 1fr; } }
     @media (max-width: 720px) { body { padding: 14px; } .app { padding: 16px 14px 18px; } }
   </style>
 </head>
 <body>
-  <div class="app">
+
+  <!-- Overlay enquanto verifica sessão -->
+  <div id="guardOverlay">Verifying access...</div>
+
+  <div class="app" id="mainApp" style="display:none;">
     <div class="header">
       <div>
-        <div class="title">FZFX Trade Validator</div>
+        <div class="title">Protocol FZFX</div>
         <div class="subtitle">Confluence checklist + trade journal</div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
@@ -258,7 +265,7 @@
           <label class="small-label" for="afterImgInput" style="margin-top:6px;">Screenshot AFTER (link)</label>
           <input id="afterImgInput" class="text-input" placeholder="URL of the chart after result" />
           <button id="saveBtn" class="save-btn">Save this setup</button>
-          <div class="hint">Trades are stored only on this device (localStorage).</div>
+          <div class="hint">Trades are stored locally on this device.</div>
         </div>
       </div>
     </div>
@@ -317,14 +324,25 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // ====== AUTH GUARD ======
+    // ====== AUTH GUARD — verifica sessão E plano ======
     const _SURL = 'https://txvcrqomdiquoupfmnng.supabase.co';
     const _SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR4dmNycW9tZGlxdW91cGZtbm5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MzYxNzYsImV4cCI6MjA5MDMxMjE3Nn0.QdMaX5cy8a3pqTcKK7f5-QPvsrhjDM2YXVeZ1WEfbI4';
     const _sb = supabase.createClient(_SURL, _SKEY);
 
     (async () => {
       const { data: { session } } = await _sb.auth.getSession();
-      if (!session) { window.location.href = 'login.html'; }
+      if (!session) { window.location.href = 'login.html'; return; }
+
+      // Verificar se tem plano pro ativo
+      const { data: profile } = await _sb.from('profiles').select('plan, status').eq('id', session.user.id).single();
+      if (!profile || profile.plan !== 'pro' || profile.status !== 'active') {
+        window.location.href = 'subscribe.html';
+        return;
+      }
+
+      // Acesso autorizado — mostrar app
+      document.getElementById('guardOverlay').style.display = 'none';
+      document.getElementById('mainApp').style.display = 'block';
     })();
 
     async function logout() {
@@ -436,7 +454,7 @@
       captionEl.textContent = info.caption;
     }
 
-    const STORAGE_KEY = "fzfx_trades_v3_en";
+    const STORAGE_KEY = "protocol_fzfx_trades_v1";
     function getHistory() { try { const r = localStorage.getItem(STORAGE_KEY); return r ? JSON.parse(r) : []; } catch { return []; } }
     function saveHistory(list) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); } catch {} }
 
