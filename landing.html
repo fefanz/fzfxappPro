@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Protocol FZFX — Trade with Conviction</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #020509;
+      --bg2: #060d14;
+      --card: rgba(6,15,26,0.95);
+      --border: rgba(100,210,200,0.12);
+      --border-bright: rgba(100,210,200,0.35);
+      --accent: #3dffc0;
+      --accent2: #46e8a0;
+      --accent-dim: rgba(61,255,192,0.08);
+      --text: #e2f0ff;
+      --text-dim: #6a90b0;
+      --text-mid: #9dbdd8;
+      --red: #ff5f5f;
+      --gold: #ffd166;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Mono', monospace;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 40px;
+      background: rgba(2,5,9,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 16px;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .nav-cta {
+      padding: 8px 22px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #021110;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      transition: all 0.2s;
+    }
+    .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(61,255,192,0.3); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      overflow: hidden;
+    }
+
+    .hero-glow {
+      position: absolute;
+      width: 700px; height: 700px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(61,255,192,0.07) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border-bright);
+      background: var(--accent-dim);
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero-tag::before {
+      content: "";
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(42px, 8vw, 96px);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+      animation: fadeUp 0.7s ease 0.1s both;
+    }
+
+    .hero h1 span {
+      display: block;
+      background: linear-gradient(135deg, var(--accent), #a8ffdf, var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: clamp(14px, 2vw, 18px);
+      color: var(--text-mid);
+      max-width: 540px;
+      line-height: 1.7;
+      margin-bottom: 48px;
+      animation: fadeUp 0.7s ease 0.2s both;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: fadeUp 0.7s ease 0.3s both;
+    }
+
+    .btn-main {
+      padding: 14px 36px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #11c5a5, var(--accent));
+      color: #021110;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      box-shadow: 0 10px 30px rgba(61,255,192,0.3);
+      transition: all 0.2s;
+      letter-spacing: 0.04em;
+    }
+    .btn-main:hover { transform: translateY(-2px); box-shadow: 0 16px 40px rgba(61,255,192,0.4); }
+
+    .btn-ghost {
+      padding: 14px 36px;
+      border-radius: 999px;
+      border: 1px solid var(--border-bright);
+      color: var(--text-mid);
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      text-decoration: none;
+      transition: all 0.2s;
+      letter-spacing: 0.04em;
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    .hero-price {
+      margin-top: 24px;
+      font-size: 12px;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
+      animation: fadeUp 0.7s ease 0.4s both;
+    }
+
+    .hero-price strong { color: var(--accent); }
+
+    /* ── TICKER ── */
+    .ticker {
+      padding: 14px 0;
+      background: rgba(61,255,192,0.04);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .ticker-inner {
+      display: inline-flex;
+      gap: 48px;
+      animation: ticker 30s linear infinite;
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+    }
+
+    .ticker-item { display: flex; align-items: center; gap: 8px; }
+    .ticker-item .up { color: var(--accent); }
+    .ticker-item .down { color: var(--red); }
+
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* ── SECTION BASE ── */
+    section {
+      position: relative;
+      z-index: 1;
+      padding: 100px 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-tag {
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(28px, 5vw, 52px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .section-desc {
+      font-size: 14px;
+      color: var(--text-mid);
+      max-width: 500px;
+      line-height: 1.8;
+      margin-bottom: 60px;
+    }
+
+    /* ── PROBLEM SECTION ── */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .problem-card {
+      background: rgba(255,95,95,0.04);
+      border: 1px solid rgba(255,95,95,0.2);
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .problem-icon { font-size: 22px; margin-bottom: 12px; }
+    .problem-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; margin-bottom: 8px; color: #ffaaaa; }
+    .problem-text { font-size: 12px; color: var(--text-dim); line-height: 1.7; }
+
+    /* ── FEATURES ── */
+    .features-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .feature-list { display: flex; flex-direction: column; gap: 24px; }
+
+    .feature-item {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      padding: 20px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      transition: all 0.2s;
+      cursor: default;
+    }
+    .feature-item:hover { border-color: var(--border-bright); transform: translateX(4px); }
+
+    .feature-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: var(--accent-dim);
+      border: 1px solid var(--border-bright);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .feature-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+    .feature-desc { font-size: 12px; color: var(--text-dim); line-height: 1.6; }
+
+    /* ── MOCK UI ── */
+    .mock-ui {
+      background: var(--card);
+      border: 1px solid var(--border-bright);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 0 80px rgba(61,255,192,0.08);
+    }
+
+    .mock-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .mock-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: 0.08em; }
+    .mock-score { font-size: 22px; font-weight: 700; color: var(--accent); font-family: 'Syne', sans-serif; }
+
+    .mock-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+
+    .mock-card {
+      background: #050b15;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 8px;
+      font-size: 10px;
+    }
+
+    .mock-card.on { border-color: rgba(61,255,192,0.4); background: rgba(61,255,192,0.05); }
+    .mock-card-label { color: var(--text-dim); letter-spacing: 0.08em; margin-bottom: 4px; }
+    .mock-card-val { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; color: var(--accent); }
+    .mock-card-val.off { color: #3a4f60; }
+    .mock-badge { display: inline-block; padding: 3px 8px; border-radius: 999px; font-size: 9px; margin-top: 4px; }
+    .mock-badge.on { background: rgba(61,255,192,0.15); color: var(--accent); border: 1px solid rgba(61,255,192,0.3); }
+    .mock-badge.off { background: rgba(255,95,95,0.1); color: #ff8b8b; border: 1px solid rgba(255,95,95,0.2); }
+
+    .mock-bar-wrap { margin-top: 10px; }
+    .mock-bar-label { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-dim); margin-bottom: 6px; }
+    .mock-bar { height: 6px; border-radius: 999px; background: #0d1e2e; overflow: hidden; }
+    .mock-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #11c5a5, var(--accent)); }
+
+    .mock-verdict {
+      margin-top: 14px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: rgba(61,255,192,0.07);
+      border: 1px solid rgba(61,255,192,0.25);
+      font-size: 11px;
+      color: var(--accent);
+      text-align: center;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 2px;
+      position: relative;
+    }
+
+    .step {
+      padding: 36px 28px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      position: relative;
+    }
+
+    .step:first-child { border-radius: 16px 0 0 16px; }
+    .step:last-child { border-radius: 0 16px 16px 0; }
+
+    .step-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 48px;
+      font-weight: 800;
+      color: rgba(61,255,192,0.12);
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+
+    .step-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; margin-bottom: 8px; }
+    .step-desc { font-size: 12px; color: var(--text-dim); line-height: 1.7; }
+
+    /* ── PRICING ── */
+    .pricing-wrap {
+      display: flex;
+      justify-content: center;
+    }
+
+    .pricing-card {
+      background: var(--card);
+      border: 1px solid var(--border-bright);
+      border-radius: 24px;
+      padding: 48px 44px;
+      text-align: center;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 0 80px rgba(61,255,192,0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pricing-card::before {
+      content: "";
+      position: absolute;
+      top: -60px; left: 50%;
+      transform: translateX(-50%);
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(61,255,192,0.08), transparent 70%);
+      pointer-events: none;
+    }
+
+    .pricing-badge {
+      display: inline-block;
+      padding: 5px 16px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #11c5a5, var(--accent));
+      color: #021110;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .pricing-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .pricing-price {
+      font-family: 'Syne', sans-serif;
+      font-size: 64px;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .pricing-period { font-size: 13px; color: var(--text-dim); margin-bottom: 32px; }
+
+    .pricing-features { list-style: none; text-align: left; margin-bottom: 32px; display: flex; flex-direction: column; gap: 12px; }
+
+    .pricing-features li {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      font-size: 13px;
+      color: var(--text-mid);
+    }
+
+    .pricing-features li::before {
+      content: "✓";
+      color: var(--accent);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .pricing-btn {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #11c5a5, var(--accent));
+      color: #021110;
+      font-family: 'DM Mono', monospace;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      box-shadow: 0 10px 30px rgba(61,255,192,0.3);
+      transition: all 0.2s;
+    }
+    .pricing-btn:hover { transform: translateY(-2px); box-shadow: 0 16px 40px rgba(61,255,192,0.45); }
+
+    .pricing-note { margin-top: 14px; font-size: 11px; color: var(--text-dim); }
+
+    /* ── FAQ ── */
+    .faq-list { display: flex; flex-direction: column; gap: 2px; max-width: 700px; }
+
+    .faq-item {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .faq-q {
+      padding: 18px 20px;
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card);
+      user-select: none;
+    }
+
+    .faq-q::after { content: "+"; color: var(--accent); font-size: 20px; font-weight: 300; transition: transform 0.2s; }
+    .faq-item.open .faq-q::after { transform: rotate(45deg); }
+
+    .faq-a {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.8;
+      background: var(--card);
+    }
+
+    .faq-a-inner { padding: 0 20px 18px; }
+    .faq-item.open .faq-a { max-height: 200px; }
+
+    /* ── CTA FINAL ── */
+    .cta-final {
+      text-align: center;
+      padding: 100px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-final::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(61,255,192,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .cta-final h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(32px, 6vw, 64px);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      letter-spacing: -0.02em;
+    }
+
+    .cta-final p { font-size: 14px; color: var(--text-dim); margin-bottom: 36px; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
+    }
+
+    .footer-logo { font-family: 'Syne', sans-serif; font-weight: 800; color: var(--accent); letter-spacing: 0.15em; font-size: 13px; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 860px) {
+      nav { padding: 16px 20px; }
+      .features-layout { grid-template-columns: 1fr; }
+      .step:first-child { border-radius: 16px 16px 0 0; }
+      .step:last-child { border-radius: 0 0 16px 16px; }
+      footer { flex-direction: column; gap: 10px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">Protocol FZFX</div>
+    <a href="register.html" class="nav-cta">Start Free →</a>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-tag">Built for traders who want to grow</div>
+    <h1>
+      Stop guessing.<br>
+      <span>Start trading</span>
+      with a system.
+    </h1>
+    <p class="hero-sub">
+      Protocol FZFX gives you a confluence validator, trade journal, and performance dashboard — everything you need to trade with confidence from day one.
+    </p>
+    <div class="hero-actions">
+      <a href="register.html" class="btn-main">Get Started — $4.99/mo</a>
+      <a href="#features" class="btn-ghost">See how it works</a>
+    </div>
+    <div class="hero-price">No contracts. Cancel anytime. <strong>Start today.</strong></div>
+  </div>
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="ticker-inner">
+      <span class="ticker-item">XAUUSD <span class="up">▲ +0.82%</span></span>
+      <span class="ticker-item">NAS100 <span class="up">▲ +1.14%</span></span>
+      <span class="ticker-item">EURUSD <span class="down">▼ -0.23%</span></span>
+      <span class="ticker-item">GBPUSD <span class="up">▲ +0.45%</span></span>
+      <span class="ticker-item">US30 <span class="up">▲ +0.67%</span></span>
+      <span class="ticker-item">BTCUSD <span class="down">▼ -1.02%</span></span>
+      <span class="ticker-item">XAUUSD <span class="up">▲ +0.82%</span></span>
+      <span class="ticker-item">NAS100 <span class="up">▲ +1.14%</span></span>
+      <span class="ticker-item">EURUSD <span class="down">▼ -0.23%</span></span>
+      <span class="ticker-item">GBPUSD <span class="up">▲ +0.45%</span></span>
+      <span class="ticker-item">US30 <span class="up">▲ +0.67%</span></span>
+      <span class="ticker-item">BTCUSD <span class="down">▼ -1.02%</span></span>
+    </div>
+  </div>
+
+  <!-- PROBLEM -->
+  <section class="reveal">
+    <div class="section-tag">// the problem</div>
+    <h2 class="section-title">Most beginner traders fail<br>for the same reasons.</h2>
+    <p class="section-desc">It's not about skill — it's about discipline, structure, and having a system that keeps you honest.</p>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="problem-icon">😵</div>
+        <div class="problem-title">Trading on emotion</div>
+        <div class="problem-text">Taking trades without proper confluence. Entering because it "looks good" — not because the setup is validated.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">🗑️</div>
+        <div class="problem-title">No trade records</div>
+        <div class="problem-text">Without a journal, you repeat the same mistakes. You can't improve what you don't track.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">📉</div>
+        <div class="problem-title">No data on yourself</div>
+        <div class="problem-text">You don't know your win rate, best pairs, or worst sessions — so you can't optimize anything.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">🎲</div>
+        <div class="problem-title">Inconsistent process</div>
+        <div class="problem-text">Every trade feels different. No checklist, no structure, no way to stay consistent under pressure.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features" class="reveal">
+    <div class="section-tag">// the solution</div>
+    <h2 class="section-title">Everything you need.<br>Nothing you don't.</h2>
+    <p class="section-desc">Protocol FZFX is built around three core tools that work together to make you a more disciplined trader.</p>
+    <div class="features-layout">
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feature-icon">⚡</div>
+          <div>
+            <div class="feature-title">Confluence Validator</div>
+            <div class="feature-desc">Score your setups before entering. Check Weekly, Daily, 4H trend, AOI, BOS, Fibo, EMAs, and more. Only trade A+ setups.</div>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">📓</div>
+          <div>
+            <div class="feature-title">Trade Journal</div>
+            <div class="feature-desc">Log every trade with pair, direction, session, risk, P&L, notes, and chart screenshots. Build your trading database.</div>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">📊</div>
+          <div>
+            <div class="feature-title">Performance Dashboard</div>
+            <div class="feature-desc">See your win rate, total P&L, best and worst pairs, and recent trades at a glance. Know exactly where you stand.</div>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">📅</div>
+          <div>
+            <div class="feature-title">P&L Calendar</div>
+            <div class="feature-desc">Visualize your daily results on a calendar. Spot your best days, worst days, and trading patterns over time.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MOCK UI -->
+      <div class="mock-ui">
+        <div class="mock-header">
+          <div class="mock-title">PROTOCOL FZFX — VALIDATOR</div>
+          <div class="mock-score">85%</div>
+        </div>
+        <div class="mock-cards">
+          <div class="mock-card on">
+            <div class="mock-card-label">WEEKLY</div>
+            <div class="mock-card-val">10%</div>
+            <div class="mock-badge on">ON</div>
+          </div>
+          <div class="mock-card on">
+            <div class="mock-card-label">AOI</div>
+            <div class="mock-card-val">20%</div>
+            <div class="mock-badge on">ON</div>
+          </div>
+          <div class="mock-card on">
+            <div class="mock-card-label">BOS/SHIFT</div>
+            <div class="mock-card-val">15%</div>
+            <div class="mock-badge on">ON</div>
+          </div>
+          <div class="mock-card on">
+            <div class="mock-card-label">FIBO 62%</div>
+            <div class="mock-card-val">10%</div>
+            <div class="mock-badge on">ON</div>
+          </div>
+          <div class="mock-card on">
+            <div class="mock-card-label">RETEST</div>
+            <div class="mock-card-val">10%</div>
+            <div class="mock-badge on">ON</div>
+          </div>
+          <div class="mock-card">
+            <div class="mock-card-label">ORDER BLOCK</div>
+            <div class="mock-card-val off">5%</div>
+            <div class="mock-badge off">OFF</div>
+          </div>
+        </div>
+        <div class="mock-bar-wrap">
+          <div class="mock-bar-label"><span>Setup Score</span><span style="color:var(--accent)">85% — High Confluence</span></div>
+          <div class="mock-bar"><div class="mock-bar-fill" style="width:85%"></div></div>
+        </div>
+        <div class="mock-verdict">✓ Strong setup. Trade only if risk makes sense.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="reveal" style="padding-top:0;">
+    <div class="section-tag">// how it works</div>
+    <h2 class="section-title" style="margin-bottom:40px;">Three steps to<br>trading with structure.</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-title">Validate your setup</div>
+        <div class="step-desc">Before entering any trade, run it through the confluence checklist. Only trade when the score is high enough.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-title">Log it in the journal</div>
+        <div class="step-desc">After the trade, record the details. Pair, direction, risk, result, notes, chart links. Build your trading history.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-title">Review your data</div>
+        <div class="step-desc">Check your dashboard weekly. See what's working, what isn't, and make decisions based on your own real data.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="reveal" style="text-align:center;">
+    <div class="section-tag">// pricing</div>
+    <h2 class="section-title" style="margin-bottom:12px;">One plan.<br>Full access.</h2>
+    <p class="section-desc" style="margin:0 auto 48px;">No tiers. No limits. Everything included for less than a coffee a month.</p>
+    <div class="pricing-wrap">
+      <div class="pricing-card">
+        <div class="pricing-badge">Most Popular</div>
+        <div class="pricing-name">Protocol FZFX Pro</div>
+        <div class="pricing-price">$4.99</div>
+        <div class="pricing-period">per month · cancel anytime</div>
+        <ul class="pricing-features">
+          <li>Confluence validator (12 factors)</li>
+          <li>Unlimited trade journal</li>
+          <li>Performance dashboard</li>
+          <li>P&L calendar</li>
+          <li>Trade history with filters</li>
+          <li>Chart screenshot links</li>
+          <li>Priority support</li>
+        </ul>
+        <a href="register.html" class="pricing-btn">Start Now — $4.99/mo</a>
+        <div class="pricing-note">Secure payment via Stripe · No hidden fees</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="reveal">
+    <div class="section-tag">// faq</div>
+    <h2 class="section-title" style="margin-bottom:40px;">Common questions.</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">Do I need trading experience to use this?</div>
+        <div class="faq-a"><div class="faq-a-inner">No. Protocol FZFX is designed for beginners. The confluence validator teaches you what to look for in a trade, and the journal helps you learn from every position you take.</div></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What markets does it support?</div>
+        <div class="faq-a"><div class="faq-a-inner">Any market — Forex, Gold, Indices, Crypto, Stocks. The system is methodology-based, not market-specific. If you have a setup, it works.</div></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Can I cancel anytime?</div>
+        <div class="faq-a"><div class="faq-a-inner">Yes, absolutely. No contracts, no commitment. Cancel anytime from your account and you won't be charged again. Simple.</div></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Is my data safe?</div>
+        <div class="faq-a"><div class="faq-a-inner">Yes. Your trades are stored securely and only you can access them. Payments are handled by Stripe — we never see your card details.</div></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What if I'm already profitable?</div>
+        <div class="faq-a"><div class="faq-a-inner">Even experienced traders use Protocol FZFX to stay disciplined and track performance. The data it generates over time is invaluable for continued growth.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA FINAL -->
+  <div class="cta-final reveal">
+    <h2>Ready to trade<br>with a real system?</h2>
+    <p>Join traders using Protocol FZFX to build discipline, track performance, and grow consistently.</p>
+    <a href="register.html" class="btn-main">Get Started — $4.99/mo</a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">PROTOCOL FZFX</div>
+    <div>© 2026 Protocol FZFX · All rights reserved</div>
+    <div><a href="login.html" style="color:var(--text-dim);text-decoration:none;">Sign in</a></div>
+  </footer>
+
+  <script>
+    // Reveal on scroll
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+    }, { threshold: 0.1 });
+    reveals.forEach(r => observer.observe(r));
+
+    // FAQ toggle
+    document.querySelectorAll('.faq-q').forEach(q => {
+      q.addEventListener('click', () => {
+        const item = q.parentElement;
+        const isOpen = item.classList.contains('open');
+        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+        if (!isOpen) item.classList.add('open');
+      });
+    });
+  </script>
+</body>
+</html>
